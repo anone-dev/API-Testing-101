@@ -1,10 +1,11 @@
 openapi: 3.0.3
 info:
   title: Simple Books API
-  version: 1.0.0
+  version: 1.0.1
   contact: {}
 servers:
   - url: https://simple-books-api.glitch.me
+  
 paths:
   /status:
     get:
@@ -235,7 +236,9 @@ paths:
       tags:
         - Submit an order
       summary: Submit an order books
-      description: "Allows you to submit a new order. Requires authentication.\n\nThe request body needs to be in JSON format and include the following properties:\n\n- `bookId`\_- Integer - Required\n- `customerName`\_- String - Required\n    \n\nThe response body will contain the order Id."
+      description: "Allows you to submit a new order. Requires authentication. \n\n `Authorization`: Bearer {YOUR TOKEN} \n\nThe request body needs to be in JSON format and include the following properties:\n\n- `bookId`\_- Integer - Required\n- `customerName`\_- String - Required\n    \n\nThe response body will contain the order Id."
+        
+        
       operationId: submitAnOrderBooks
       requestBody:
         content:
@@ -320,7 +323,8 @@ paths:
         - Delete an order
       summary: Delete an order
       description: |-
-        Delete an existing order. Requires authentication.
+        Delete an existing order. Requires authentication.  
+        `Authorization`: Bearer {YOUR TOKEN} 
 
         The request body needs to be empty.
       operationId: deleteAnOrder
@@ -343,7 +347,7 @@ paths:
       tags:
         - Update an order
       summary: Update an order
-      description: "Update an existing order. Requires authentication.\n\nThe request body needs to be in JSON format and allows you to update the following properties:\n\n- `customerName`\_- String"
+      description: "Update an existing order. Requires authentication. \n\n `Authorization`: Bearer {YOUR TOKEN} \n\n \n\nThe request body needs to be in JSON format and allows you to update the following properties:\n\n- `customerName`\_- String"
       operationId: updateAnOrder
       requestBody:
         content:
@@ -377,6 +381,7 @@ paths:
         schema:
           type: string
           example: '{{orderId}}'
+
 tags:
   - name: Ping - HealthCheck
   - name: API Authentication
