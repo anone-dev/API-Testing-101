@@ -4,7 +4,7 @@ info:
   version: 1.0.1
   contact: {}
 servers:
-  - url: https://simple-books-api.glitch.me
+  - url: https://simple-books-api.click
   
 paths:
   /status:
