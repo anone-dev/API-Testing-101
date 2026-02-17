@@ -1,0 +1,14 @@
+# Ignore books-app (work in progress)
+books-app/
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# Build artifacts
+dist/
+build/
+*.spec
