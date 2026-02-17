@@ -398,6 +398,24 @@
     <script>
         const API_URL = 'http://localhost:5000';
         let token = localStorage.getItem('apiToken') || '';
+        let isAuthenticated = localStorage.getItem('authenticated') === 'true';
+
+        // Check password on page load
+        if (!isAuthenticated) {
+            const password = prompt('🔐 Enter password to access:');
+            if (password !== 'qacoe') {
+                alert('❌ Incorrect password!');
+                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:2em;color:white;">🔒 Access Denied</div>';
+                throw new Error('Access denied');
+            }
+            localStorage.setItem('authenticated', 'true');
+            isAuthenticated = true;
+        }
+
+        // Clear auth when server restarts (check server status)
+        fetch(`${API_URL}/status`).catch(() => {
+            localStorage.removeItem('authenticated');
+        });
 
         const colorThemes = {
             '1': { // Cool & Elegant

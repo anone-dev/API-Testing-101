@@ -79,6 +79,7 @@ curl http://localhost:5000/orders ^
 
 ## Features
 
+✅ **Password Protected** - รหัสผ่าน: `qacoe` (ใส่ครั้งเดียวต่อการเปิด app)
 ✅ **Web UI** - อินเตอร์เฟซแบบกราฟิกสำหรับจัดการ Books และ Orders
 ✅ **Swagger UI** - API Documentation แบบสมบูรณ์
 ✅ รองรับ CORS

@@ -150,6 +150,10 @@ def reset_stock():
     books = copy.deepcopy(initial_books)
     return jsonify({"message": "Stock reset successfully"}), 200
 
+@app.route('/clear-auth', methods=['POST'])
+def clear_auth():
+    return jsonify({"message": "Auth cleared"}), 200
+
 def open_browser():
     webbrowser.open('http://localhost:5000/ui.html')
 
@@ -160,5 +164,6 @@ if __name__ == '__main__':
     print("  🎨 Web UI: http://localhost:5000/ui.html")
     print("  📖 API Docs: http://localhost:5000/api-docs.html")
     print("="*60 + "\n")
+    # Clear localStorage on server start
     threading.Timer(1.5, open_browser).start()
     app.run(host='0.0.0.0', port=5000, debug=False)
