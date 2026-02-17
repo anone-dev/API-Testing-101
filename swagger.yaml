@@ -5,6 +5,17 @@ info:
   contact: {}
 servers:
   - url: https://simple-books-api.click
+  - url: https://simple-books-api.glitch.me
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   
 paths:
   /status:
@@ -16,7 +27,7 @@ paths:
       operationId: status
       responses:
         '200':
-          description: Successful operation
+          description: Sample Response - Successful operation
           content:
             application/json:
               schema:
@@ -57,7 +68,7 @@ paths:
               clientName: Postman YourName
       responses:
         '201':
-          description: Success
+          description: Sample Response - Success
           content:
             application/json:
               schema:
@@ -68,7 +79,7 @@ paths:
                     example: >-
                       a6c2833e29d5386f2e11bcbe7b5fcee6047802f7216cdefcc51b0396a70f2208
         '409':
-          description: Fail
+          description: Sample Response - Fail
           content:
             application/json:
               schema:
@@ -103,7 +114,7 @@ paths:
             example: '{{varLimit}}'
       responses:
         '200':
-          description: Success
+          description: Sample Response - Success
           content:
             application/json:
               schema:
@@ -136,9 +147,14 @@ paths:
                     id: 3
                     name: The Vanishing Half
                     type: fiction
-                  - available: true
 
   /books/{bookId}:
+    parameters:
+      - name: bookId
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - Get books info
@@ -147,7 +163,7 @@ paths:
       operationId: getASingleBook
       responses:
         '200':
-          description: Success
+          description: Sample Response - Success
           content:
             application/json:
               schema:
@@ -174,13 +190,7 @@ paths:
                   type:
                     type: string
                     example: non-fiction
-    parameters:
-      - name: bookId
-        in: path
-        required: true
-        schema:
-          type: string
-          example: ''
+
   /orders:
     get:
       tags:
@@ -188,9 +198,11 @@ paths:
       summary: Get all orders
       description: Allows you to view all orders. Requires authentication.
       operationId: getAllOrders
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: Success
+          description: Sample Response - Success
           content:
             application/json:
               schema:
@@ -232,14 +244,30 @@ paths:
                     id: 0EsWAZrNDwTXBhflACLNB
                     quantity: 1
                     timestamp: 1689920580970
+        '401':
+          description: Sample Response - Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              examples:
+                MissingAuth:
+                  value:
+                    error: Missing Authorization header.
+                InvalidToken:
+                  value:
+                    error: Invalid bearer token.
     post:
       tags:
         - Submit an order
       summary: Submit an order books
       description: "Allows you to submit a new order. Requires authentication. \n\n `Authorization`: Bearer {YOUR TOKEN} \n\nThe request body needs to be in JSON format and include the following properties:\n\n- `bookId`\_- Integer - Required\n- `customerName`\_- String - Required\n    \n\nThe response body will contain the order Id."
-        
-        
       operationId: submitAnOrderBooks
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -257,7 +285,7 @@ paths:
               customerName: Postman YourName
       responses:
         '201':
-          description: Success
+          description: Sample Response - Success
           content:
             application/json:
               schema:
@@ -274,42 +302,66 @@ paths:
                   value:
                     created: true
                     orderId: ZepXNRHsLu-4OWYVXXPEO
+        '401':
+          description: Sample Response - Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              examples:
+                MissingAuth:
+                  value:
+                    error: Missing Authorization header.
+                InvalidToken:
+                  value:
+                    error: Invalid bearer token.
+
   /orders/{orderId}:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: string
     get:
       tags:
         - Get orders info
       summary: Get an order
       description: Allows you to view an existing order. Requires authentication.
       operationId: getAnOrder
+      security:
+        - bearerAuth: []
       responses:
         '200':
-          description: Success
+          description: Sample Response - Success
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  id:
+                    type: string
+                    example: ZepXNRHsLu-4OWYVXXPEO
                   bookId:
                     type: number
                     example: 5
-                  createdBy:
-                    type: string
-                    example: >-
-                      7d0457ec1c698f2fbd80a7910bb6156fab227ab001d2438e0e6a771cd42e4eec
                   customerName:
                     type: string
                     example: Postman YourName
-                  id:
-                    type: string
-                    example: 0EsWAZrNDwTXBhflACLNB
                   quantity:
                     type: number
                     example: 1
+                  createdBy:
+                    type: string
+                    example: 7d0457ec1c698f2fbd80a7910bb6156fab227ab001d2438e0e6a771cd42e4eec
                   timestamp:
                     type: number
-                    example: 1689920580970
-        '404':
-          description: Fail
+                    example: 1689920515902
+        '401':
+          description: Sample Response - Unauthorized
           content:
             application/json:
               schema:
@@ -317,23 +369,15 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: No order with id ZcgDwG7HIJcHp34IGtwe-.
-    delete:
-      tags:
-        - Delete an order
-      summary: Delete an order
-      description: |-
-        Delete an existing order. Requires authentication.  
-        `Authorization`: Bearer {YOUR TOKEN} 
-
-        The request body needs to be empty.
-      operationId: deleteAnOrder
-      responses:
-        '204':
-          description: Success
-          content: {}
+              examples:
+                MissingAuth:
+                  value:
+                    error: Missing Authorization header.
+                InvalidToken:
+                  value:
+                    error: Invalid bearer token.
         '404':
-          description: Fail
+          description: Sample Response - Order not found
           content:
             application/json:
               schema:
@@ -341,14 +385,15 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: No order with id TVqBfK5uSTBCbm6nHQbB4.
-
+                    example: No order with id ZepXNRHsLu-4OWYVXXPEO.
     patch:
       tags:
         - Update an order
       summary: Update an order
-      description: "Update an existing order. Requires authentication. \n\n `Authorization`: Bearer {YOUR TOKEN} \n\n \n\nThe request body needs to be in JSON format and allows you to update the following properties:\n\n- `customerName`\_- String"
+      description: "Update an existing order. Requires authentication. \n\n `Authorization`: Bearer {YOUR TOKEN} \n\nThe request body needs to be in JSON format and allows you to update the following properties:\n\n- `customerName` - String"
       operationId: updateAnOrder
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -362,10 +407,9 @@ paths:
               customerName: Update Postman YourName
       responses:
         '204':
-          description: Success
-          content: {}
-        '404':
-          description: Fail
+          description: Sample Response - Success (No content returned)
+        '401':
+          description: Sample Response - Unauthorized
           content:
             application/json:
               schema:
@@ -373,14 +417,62 @@ paths:
                 properties:
                   error:
                     type: string
-                    example: No order with id :orderId.
-    parameters:
-      - name: orderId
-        in: path
-        required: true
-        schema:
-          type: string
-          example: '{{orderId}}'
+              examples:
+                MissingAuth:
+                  value:
+                    error: Missing Authorization header.
+                InvalidToken:
+                  value:
+                    error: Invalid bearer token.
+        '404':
+          description: Sample Response - Order not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: No order with id ZepXNRHsLu-4OWYVXXPEO.
+    delete:
+      tags:
+        - Delete an order
+      summary: Delete an order
+      description: |-
+        Delete an existing order. Requires authentication.  
+        `Authorization`: Bearer {YOUR TOKEN}
+      operationId: deleteAnOrder
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Sample Response - Success (No content returned)
+        '401':
+          description: Sample Response - Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+              examples:
+                MissingAuth:
+                  value:
+                    error: Missing Authorization header.
+                InvalidToken:
+                  value:
+                    error: Invalid bearer token.
+        '404':
+          description: Sample Response - Order not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: No order with id ZepXNRHsLu-4OWYVXXPEO.
 
 tags:
   - name: Ping - HealthCheck
