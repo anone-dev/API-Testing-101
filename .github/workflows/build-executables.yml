@@ -45,7 +45,7 @@ jobs:
         pyinstaller --onefile --add-data "ui.html:." --add-data "api-docs.html:." --add-data "swagger-local.yaml:." --name "BooksAPI-macOS" app_standalone.py
     
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.artifact_name }}
         path: books-local/dist/${{ matrix.output_name }}
