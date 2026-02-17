@@ -6,6 +6,9 @@ from datetime import datetime
 app = Flask(__name__)
 CORS(app)
 
+# Store server start time
+SERVER_START_TIME = datetime.now().timestamp()
+
 initial_books = [
     {"id": 1, "name": "The Russian", "type": "fiction", "available": True, "author": "James Patterson", "price": 12.99, "current-stock": 3},
     {"id": 2, "name": "Just as I Am", "type": "non-fiction", "available": False, "author": "Cicely Tyson", "price": 20.33, "current-stock": 0},
@@ -42,7 +45,14 @@ orders = {}
 
 @app.route('/status')
 def status():
-    return jsonify({"status": "OK"})
+    response = jsonify({
+        "status": "OK",
+        "startTime": str(SERVER_START_TIME)
+    })
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/api-clients', methods=['POST'])
 def register_client():

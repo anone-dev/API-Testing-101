@@ -90,3 +90,60 @@ curl http://localhost:5000/orders ^
 ✅ **Reset Stock** - รีเซ็ตสต็อกโดยไม่ต้อง restart server
 ✅ **Color Themes** - 6 ชุดสีให้เลือก
 ✅ **Playwright Ready** - มี data-testid สำหรับ automation testing
+
+## 🎭 Playwright Automation Testing
+
+Web UI มี **data-testid attributes** ครบถ้วนสำหรับ automation testing ด้วย Playwright
+
+### ตัวอย่าง Test Scenarios
+
+```javascript
+// 1. Login
+await page.fill('[data-testid="password-input"]', 'qacoe');
+await page.click('[data-testid="password-submit"]');
+
+// 2. Register API Client
+await page.fill('[data-testid="email-input"]', 'test@example.com');
+await page.fill('[data-testid="name-input"]', 'Test User');
+await page.click('[data-testid="register-button"]');
+
+// 3. View Book Details
+await page.click('[data-testid="book-card-1"]');
+await expect(page.locator('[data-testid="detail-value-name"]')).toBeVisible();
+
+// 4. Create Order
+await page.click('[data-testid="orders-tab"]');
+await page.fill('[data-testid="order-book-id"]', '1');
+await page.fill('[data-testid="order-customer-name"]', 'John Doe');
+await page.click('[data-testid="create-order-button"]');
+
+// 5. Edit Order
+await page.click('[data-testid="edit-order-1"]');
+await page.fill('[data-testid="edit-customer-name"]', 'Jane Doe');
+await page.click('[data-testid="save-order-button"]');
+
+// 6. Delete Order
+await page.click('[data-testid="delete-order-1"]');
+await page.click('[data-testid="confirm-delete-button"]');
+```
+
+### รายการ data-testid ที่สำคัญ
+
+**Authentication:**
+- `password-input`, `password-submit`, `password-error`
+- `email-input`, `name-input`, `register-button`, `token-display`
+
+**Navigation:**
+- `books-tab`, `orders-tab`, `swagger-tab`
+
+**Books:**
+- `book-card-{id}`, `book-title-{id}`, `book-type-{id}`, `book-status-{id}`
+- `type-filter`, `limit-filter`, `refresh-books-button`, `reset-stock-button`
+
+**Orders:**
+- `order-book-id`, `order-customer-name`, `create-order-button`
+- `order-item-{id}`, `edit-order-{id}`, `delete-order-{id}`
+
+**Modals:**
+- `book-modal`, `order-modal`, `delete-modal`
+- `modal-close`, `save-order-button`, `confirm-delete-button`

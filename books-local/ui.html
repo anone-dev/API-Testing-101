@@ -243,9 +243,77 @@
             color: #2d3748;
             flex: 1;
         }
+        .password-modal {
+            display: flex;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+        }
+        .password-box {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+        .password-box h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        .password-box .subtitle {
+            color: #718096;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+        .password-box .developer {
+            color: #a0aec0;
+            margin-bottom: 30px;
+            font-size: 0.85em;
+        }
+        .password-box h2 {
+            margin-bottom: 20px;
+            color: #667eea;
+            font-size: 1.3em;
+        }
+        .password-box input {
+            margin-bottom: 20px;
+        }
+        .password-error {
+            color: #f56565;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+            min-width: 120px;
+        }
+        .detail-value {
+            color: #2d3748;
+            flex: 1;
+        }
     </style>
 </head>
 <body>
+    <div id="passwordModal" class="password-modal" data-testid="password-modal">
+        <div class="password-box">
+            <h1>📚 Simple Books API</h1>
+            <p class="subtitle">Local Mock Server - Modern Web UI</p>
+            <p class="developer">Developed by: Anan.Ph : QA-CoE | 2026-02-17</p>
+            <h2>🔐 Enter Password</h2>
+            <input type="password" id="passwordInput" data-testid="password-input" placeholder="Enter password" style="width: 100%;">
+            <div id="passwordError" class="password-error hidden" data-testid="password-error"></div>
+            <button onclick="checkPassword()" data-testid="password-submit" style="width: 100%;">🔓 Login</button>
+        </div>
+    </div>
+
     <header>
         <h1>📚 Simple Books API</h1>
         <p style="font-size: 1.1em; color: #718096;">Local Mock Server - Modern Web UI</p>
@@ -400,22 +468,66 @@
         let token = localStorage.getItem('apiToken') || '';
         let isAuthenticated = localStorage.getItem('authenticated') === 'true';
 
-        // Check password on page load
-        if (!isAuthenticated) {
-            const password = prompt('🔐 Enter password to access:');
-            if (password !== 'qacoe') {
-                alert('❌ Incorrect password!');
-                document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-size:2em;color:white;">🔒 Access Denied</div>';
-                throw new Error('Access denied');
+        // Show/hide password modal
+        if (isAuthenticated) {
+            document.getElementById('passwordModal').style.display = 'none';
+            
+            // Check if server restarted
+            const serverStartTime = localStorage.getItem('serverStartTime');
+            if (serverStartTime) {
+                fetch(`${API_URL}/status`)
+                    .then(res => res.json())
+                    .then(data => {
+                        const currentStartTime = data.startTime;
+                        if (currentStartTime !== serverStartTime) {
+                            // Server restarted, clear auth and reload
+                            localStorage.removeItem('authenticated');
+                            localStorage.setItem('serverStartTime', currentStartTime);
+                            location.reload();
+                        }
+                    })
+                    .catch(() => {
+                        // Server offline, clear auth
+                        localStorage.removeItem('authenticated');
+                        localStorage.removeItem('serverStartTime');
+                    });
             }
-            localStorage.setItem('authenticated', 'true');
-            isAuthenticated = true;
+        } else {
+            document.getElementById('passwordModal').style.display = 'flex';
         }
 
-        // Clear auth when server restarts (check server status)
-        fetch(`${API_URL}/status`).catch(() => {
-            localStorage.removeItem('authenticated');
+        // Handle Enter key in password input
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') checkPassword();
         });
+
+        function checkPassword() {
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('passwordError');
+            
+            if (password === 'qacoe') {
+                // Get server start time before setting authenticated
+                fetch(`${API_URL}/status`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.startTime) {
+                            localStorage.setItem('serverStartTime', data.startTime);
+                        }
+                        localStorage.setItem('authenticated', 'true');
+                        document.getElementById('passwordModal').style.display = 'none';
+                        isAuthenticated = true;
+                    })
+                    .catch(() => {
+                        errorDiv.textContent = '❌ Cannot connect to server!';
+                        errorDiv.classList.remove('hidden');
+                    });
+            } else {
+                errorDiv.textContent = '❌ Incorrect password!';
+                errorDiv.classList.remove('hidden');
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
 
         const colorThemes = {
             '1': { // Cool & Elegant

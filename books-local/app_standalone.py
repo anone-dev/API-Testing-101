@@ -11,6 +11,9 @@ import copy
 app = Flask(__name__)
 CORS(app)
 
+# Store server start time
+SERVER_START_TIME = datetime.now().timestamp()
+
 # Get base path for bundled files
 if getattr(sys, 'frozen', False):
     base_path = sys._MEIPASS
@@ -67,7 +70,14 @@ def swagger_yaml():
 
 @app.route('/status')
 def status():
-    return jsonify({"status": "OK"})
+    response = jsonify({
+        "status": "OK",
+        "startTime": str(SERVER_START_TIME)
+    })
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @app.route('/api-clients', methods=['POST'])
 def register_client():
