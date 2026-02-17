@@ -318,6 +318,16 @@ paths:
                 InvalidToken:
                   value:
                     error: Invalid bearer token.
+        '404':
+          description: Sample Response - Book not in stock
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: This book is not in stock. Try again later.
 
   /orders/{orderId}:
     parameters:

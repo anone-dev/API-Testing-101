@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Books API - Web UI</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { 
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            color: #2d3748;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        header h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .tabs { 
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 10px;
+            border-radius: 12px;
+        }
+        .tab { 
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: #4a5568;
+        }
+        .tab:hover { background: rgba(102,126,234,0.1); color: #667eea; }
+        .tab.active { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .content { 
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .hidden { display: none; }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 24px; }
+        .book-card { 
+            border: 2px solid #e2e8f0;
+            padding: 0;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            background: white;
+            cursor: pointer;
+        }
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px rgba(0,0,0,0.15); }
+        .book-card.unavailable { opacity: 0.7; }
+        .book-cover { 
+            width: 100%;
+            height: 180px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .book-cover.fiction { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .book-cover.non-fiction { background: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%); }
+        .book-emoji { font-size: 4em; user-select: none; }
+        .book-info { padding: 20px; }
+        .book-title { font-size: 1.2em; font-weight: 700; margin-bottom: 10px; color: #2d3748; }
+        .badge { 
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .badge.fiction { background: #667eea; color: white; }
+        .badge.non-fiction { background: #f2994a; color: white; }
+        .badge.available { background: #d4f4dd; color: #1e7e34; border: 1px solid #48bb78; }
+        .badge.unavailable { background: #f7fafc; color: #718096; border: 1px solid #cbd5e0; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #2d3748; }
+        input, select { 
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102,126,234,0.1); }
+        button { 
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(102,126,234,0.4); }
+        button.danger { background: linear-gradient(135deg, #f5576c 0%, #f093fb 100%); }
+        button.secondary { background: #e2e8f0; color: #2d3748; }
+        .order-list { list-style: none; }
+        .order-item { 
+            padding: 20px;
+            border: 2px solid #e2e8f0;
+            margin-bottom: 15px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            transition: all 0.3s;
+        }
+        .order-item:hover { border-color: #667eea; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .alert { 
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            animation: slideIn 0.3s;
+        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .alert.success { background: #c6f6d5; color: #22543d; border-left: 4px solid #48bb78; }
+        .alert.error { background: #fed7d7; color: #742a2a; border-left: 4px solid #f56565; }
+        .auth-section { 
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .token-display { 
+            background: rgba(255,255,255,0.9);
+            padding: 12px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .filters { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+        .filters > * { flex: 1; min-width: 150px; }
+        .book-id { 
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .color-selector {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .color-selector h3 { margin-bottom: 15px; color: #2d3748; }
+        .color-selector select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .modal { 
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .modal.show { display: flex; align-items: center; justify-content: center; }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s;
+        }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .modal-header {
+            padding: 24px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body { padding: 24px; }
+        .modal-close {
+            background: #e2e8f0;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .modal-close:hover { background: #cbd5e0; transform: rotate(90deg); }
+        .detail-row {
+            display: flex;
+            padding: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label {
+            font-weight: 600;
+            color: #4a5568;
+            min-width: 120px;
+        }
+        .detail-value {
+            color: #2d3748;
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>📚 Simple Books API</h1>
+        <p style="font-size: 1.1em; color: #718096;">Local Mock Server - Modern Web UI</p>
+        <p style="font-size: 0.9em; color: #a0aec0; margin-top: 10px;">Developed by: Anan.Ph : QA-CoE | 2026-02-17</p>
+    </header>
+
+    <div class="container">
+        <div class="color-selector">
+            <h3>🎨 เลือกชุดสี</h3>
+            <select id="colorTheme" onchange="changeColorTheme()">
+                <option value="1">ชุดที่ 1: Cool & Elegant (น้ำเงิน-ม่วง / ทอง-ส้ม)</option>
+                <option value="2">ชุดที่ 2: Ocean Breeze (น้ำเงิน-ม่วง / เขียวมิ้นท์-ฟ้า)</option>
+                <option value="3">ชุดที่ 3: Sunset Romance (น้ำเงิน-ม่วง / ชมพูพีช-เหลือง)</option>
+                <option value="4" selected>ชุดที่ 4: Fire & Ice (น้ำเงิน-ม่วง / ส้มแดง-ชมพู)</option>
+                <option value="5">ชุดที่ 5: Royal Purple (ม่วงเข้ม-ชมพู / เขียวมรกต-ฟ้า)</option>
+                <option value="6">ชุดที่ 6: Soft Pastel (ม่วงอ่อน-ฟ้า / ส้มพีช-ชมพู)</option>
+            </select>
+        </div>
+
+        <div class="auth-section" id="authSection">
+            <h3 style="margin-bottom: 15px;">🔐 Authentication</h3>
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="clientEmail" data-testid="email-input" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="clientName" data-testid="name-input" placeholder="Your Name">
+            </div>
+            <button onclick="registerClient()" data-testid="register-button">Register & Get Token</button>
+            <div id="tokenDisplay" class="token-display hidden" data-testid="token-display" style="margin-top: 10px;"></div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('books')" data-testid="books-tab">📖 Books</button>
+            <button class="tab" onclick="showTab('orders')" data-testid="orders-tab">🛒 Orders</button>
+            <button class="tab" onclick="showTab('swagger')" data-testid="swagger-tab">📄 API Docs</button>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div id="booksTab" class="content">
+            <h2 style="margin-bottom: 20px;">Books Collection</h2>
+            <div class="filters">
+                <select id="typeFilter" data-testid="type-filter" onchange="loadBooks()">
+                    <option value="">All Types</option>
+                    <option value="fiction">Fiction</option>
+                    <option value="non-fiction">Non-Fiction</option>
+                </select>
+                <input type="number" id="limitFilter" data-testid="limit-filter" placeholder="Limit (1-20)" min="1" max="20" value="5" onchange="loadBooks()">
+                <button onclick="loadBooks()" data-testid="refresh-books-button" class="secondary">🔄 Refresh</button>
+                <button onclick="resetStock()" data-testid="reset-stock-button" class="danger">🔄 Reset Stock</button>
+            </div>
+            <div id="booksList" class="book-grid" data-testid="books-list"></div>
+        </div>
+
+        <div id="ordersTab" class="content hidden">
+            <h2 style="margin-bottom: 20px;">My Orders</h2>
+            <div style="margin-bottom: 30px; padding: 20px; background: #f7fafc; border-radius: 12px;">
+                <h3 style="margin-bottom: 15px;">Create New Order</h3>
+                <div class="form-group">
+                    <label>Book ID:</label>
+                    <input type="number" id="orderBookId" data-testid="order-book-id" placeholder="Enter book ID">
+                </div>
+                <div class="form-group">
+                    <label>Customer Name:</label>
+                    <input type="text" id="orderCustomerName" data-testid="order-customer-name" placeholder="Your name">
+                </div>
+                <button onclick="createOrder()" data-testid="create-order-button">📦 Create Order</button>
+            </div>
+            <hr style="margin: 30px 0; border: none; border-top: 2px solid #e2e8f0;">
+            <button onclick="loadOrders()" data-testid="refresh-orders-button" class="secondary" style="margin-bottom: 20px;">🔄 Refresh Orders</button>
+            <ul id="ordersList" class="order-list" data-testid="orders-list"></ul>
+        </div>
+
+        <div id="swaggerTab" class="content hidden">
+            <h2 style="margin-bottom: 20px;">API Documentation</h2>
+            <p style="margin-bottom: 20px; color: #718096;">View the complete API documentation with Swagger UI:</p>
+            <button onclick="window.open('api-docs.html', '_blank')" data-testid="open-swagger-button">📄 Open Swagger UI</button>
+        </div>
+    </div>
+
+    <div id="bookModal" class="modal" data-testid="book-modal" onclick="if(event.target === this) closeModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle" data-testid="modal-title">📖 Book Details</h2>
+                <button class="modal-close" onclick="closeModal()" data-testid="modal-close">×</button>
+            </div>
+            <div class="modal-body" id="modalBody" data-testid="modal-body"></div>
+        </div>
+    </div>
+
+    <div id="orderModal" class="modal" data-testid="order-modal" onclick="if(event.target === this) closeOrderModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-testid="order-modal-title">✏️ Edit Order</h2>
+                <button class="modal-close" onclick="closeOrderModal()" data-testid="order-modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Order ID:</label>
+                    <input type="text" id="editOrderId" data-testid="edit-order-id" readonly style="background: #f7fafc;">
+                </div>
+                <div class="form-group">
+                    <label>Book ID:</label>
+                    <input type="text" id="editBookId" data-testid="edit-book-id" readonly style="background: #f7fafc;">
+                </div>
+                <div class="form-group">
+                    <label>Customer Name:</label>
+                    <input type="text" id="editCustomerName" data-testid="edit-customer-name" placeholder="Enter new customer name">
+                </div>
+                <div style="display: flex; gap: 12px;">
+                    <button onclick="saveOrderUpdate()" data-testid="save-order-button" style="flex: 1;">💾 Save</button>
+                    <button onclick="closeOrderModal()" data-testid="cancel-order-button" class="secondary" style="flex: 1;">❌ Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="deleteModal" class="modal" data-testid="delete-modal" onclick="if(event.target === this) closeDeleteModal()">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 data-testid="delete-modal-title">🗑️ Confirm Delete</h2>
+                <button class="modal-close" onclick="closeDeleteModal()" data-testid="delete-modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 20px; font-size: 16px; color: #2d3748;" data-testid="delete-message">
+                    ⚠️ Are you sure you want to delete this order?
+                </p>
+                <div class="detail-row">
+                    <div class="detail-label" data-testid="delete-label-order-id">Order ID:</div>
+                    <div class="detail-value" data-testid="delete-value-order-id" id="deleteOrderId"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label" data-testid="delete-label-book-id">Book ID:</div>
+                    <div class="detail-value" data-testid="delete-value-book-id" id="deleteBookId"></div>
+                </div>
+                <div class="detail-row">
+                    <div class="detail-label" data-testid="delete-label-customer">Customer:</div>
+                    <div class="detail-value" data-testid="delete-value-customer" id="deleteCustomerName"></div>
+                </div>
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button onclick="confirmDelete()" data-testid="confirm-delete-button" class="danger" style="flex: 1;">🗑️ Delete</button>
+                    <button onclick="closeDeleteModal()" data-testid="cancel-delete-button" class="secondary" style="flex: 1;">❌ Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000';
+        let token = localStorage.getItem('apiToken') || '';
+
+        const colorThemes = {
+            '1': { // Cool & Elegant
+                fiction: { gradient: '#667eea 0%, #764ba2 100%', badge: '#667eea', badgeText: 'white' },
+                nonFiction: { gradient: '#f2994a 0%, #f2c94c 100%', badge: '#f2994a', badgeText: 'white' }
+            },
+            '2': { // Ocean Breeze
+                fiction: { gradient: '#667eea 0%, #764ba2 100%', badge: '#667eea', badgeText: 'white' },
+                nonFiction: { gradient: '#43e97b 0%, #38f9d7 100%', badge: '#38f9d7', badgeText: '#1a202c' }
+            },
+            '3': { // Sunset Romance
+                fiction: { gradient: '#667eea 0%, #764ba2 100%', badge: '#667eea', badgeText: 'white' },
+                nonFiction: { gradient: '#fa709a 0%, #fee140 100%', badge: '#fa709a', badgeText: 'white' }
+            },
+            '4': { // Fire & Ice
+                fiction: { gradient: '#667eea 0%, #764ba2 100%', badge: '#667eea', badgeText: 'white' },
+                nonFiction: { gradient: '#ff6a88 0%, #ff9a56 100%', badge: '#ff6a88', badgeText: 'white' }
+            },
+            '5': { // Royal Purple
+                fiction: { gradient: '#8e2de2 0%, #4a00e0 100%', badge: '#8e2de2', badgeText: 'white' },
+                nonFiction: { gradient: '#11998e 0%, #38ef7d 100%', badge: '#11998e', badgeText: 'white' }
+            },
+            '6': { // Soft Pastel
+                fiction: { gradient: '#a8c0ff 0%, #3f2b96 100%', badge: '#a8c0ff', badgeText: '#3f2b96' },
+                nonFiction: { gradient: '#ffecd2 0%, #fcb69f 100%', badge: '#fcb69f', badgeText: '#8b4513' }
+            }
+        };
+
+        function changeColorTheme() {
+            const theme = document.getElementById('colorTheme').value;
+            const colors = colorThemes[theme];
+            
+            const style = document.createElement('style');
+            style.id = 'dynamic-theme';
+            style.textContent = `
+                .book-cover.fiction { background: linear-gradient(135deg, ${colors.fiction.gradient}) !important; }
+                .book-cover.non-fiction { background: linear-gradient(135deg, ${colors.nonFiction.gradient}) !important; }
+                .badge.fiction { background: ${colors.fiction.badge} !important; color: ${colors.fiction.badgeText} !important; }
+                .badge.non-fiction { background: ${colors.nonFiction.badge} !important; color: ${colors.nonFiction.badgeText} !important; }
+            `;
+            
+            const oldStyle = document.getElementById('dynamic-theme');
+            if (oldStyle) oldStyle.remove();
+            document.head.appendChild(style);
+        }
+
+        // Apply default theme
+        changeColorTheme();
+
+        if (token) {
+            document.getElementById('tokenDisplay').innerHTML = `<strong>Token:</strong> ${token}`;
+            document.getElementById('tokenDisplay').classList.remove('hidden');
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            alert.setAttribute('data-testid', `alert-${type}`);
+            document.getElementById('alertContainer').appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));
+            event.target.classList.add('active');
+            document.getElementById(tab + 'Tab').classList.remove('hidden');
+            
+            if (tab === 'books') loadBooks();
+            if (tab === 'orders') loadOrders();
+        }
+
+        async function registerClient() {
+            const email = document.getElementById('clientEmail').value;
+            const name = document.getElementById('clientName').value;
+            
+            try {
+                const res = await fetch(`${API_URL}/api-clients`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ clientEmail: email, clientName: name })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    token = data.accessToken;
+                    localStorage.setItem('apiToken', token);
+                    document.getElementById('tokenDisplay').innerHTML = `<strong>Token:</strong> ${token}`;
+                    document.getElementById('tokenDisplay').classList.remove('hidden');
+                    showAlert('✅ Registration successful!');
+                } else {
+                    showAlert('❌ ' + data.error, 'error');
+                }
+            } catch (err) {
+                showAlert('❌ Error: ' + err.message, 'error');
+            }
+        }
+
+        async function loadBooks() {
+            const type = document.getElementById('typeFilter').value;
+            const limit = document.getElementById('limitFilter').value || 5;
+            let url = `${API_URL}/books?`;
+            if (type) url += `type=${type}&`;
+            if (limit) url += `limit=${limit}`;
+            
+            try {
+                const res = await fetch(url);
+                const books = await res.json();
+                
+                const bookEmojis = {
+                    1: '🇷🇺', 2: '🎭', 3: '👯', 4: '🌙', 5: '🦁', 6: '💍',
+                    7: '🔐', 8: '⚛️', 9: '🤫', 10: '🎓', 11: '🦐', 12: '🌟',
+                    13: '💃', 14: '🧬', 15: '🚀', 16: '🧠', 17: '💔', 18: '🤔',
+                    19: '👻', 20: '🖕', 21: '🏛️', 22: '⏰', 23: '⚔️', 24: '💪', 25: '🕊️'
+                };
+                
+                const html = books.map(book => `
+                    <div class="book-card ${book.available ? '' : 'unavailable'}" data-testid="book-card-${book.id}" onclick="viewBookDetails(${book.id})">
+                        <div class="book-cover ${book.type}">
+                            <span class="book-emoji">${bookEmojis[book.id] || '📚'}</span>
+                            <div class="book-id">ID: ${book.id}</div>
+                        </div>
+                        <div class="book-info">
+                            <div class="book-title" data-testid="book-title-${book.id}">${book.name}</div>
+                            <div style="margin-bottom: 10px;">
+                                <span class="badge ${book.type}" data-testid="book-type-${book.id}">${book.type}</span>
+                                <span class="badge ${book.available ? 'available' : 'unavailable'}" data-testid="book-status-${book.id}">
+                                    ${book.available ? '✅ Available' : '❌ Out of Stock'}
+                                </span>
+                            </div>
+                            <button onclick="event.stopPropagation(); viewBookDetails(${book.id})" data-testid="view-details-${book.id}" class="secondary" style="width: 100%;">🔍 View Details</button>
+                        </div>
+                    </div>
+                `).join('');
+                
+                document.getElementById('booksList').innerHTML = html || '<p style="text-align: center; color: #718096;">No books found</p>';
+            } catch (err) {
+                showAlert('❌ Error loading books', 'error');
+            }
+        }
+
+        async function viewBookDetails(id) {
+            try {
+                const res = await fetch(`${API_URL}/books/${id}`);
+                const book = await res.json();
+                
+                const bookEmojis = {
+                    1: '🇷🇺', 2: '🎭', 3: '👯', 4: '🌙', 5: '🦁', 6: '💍',
+                    7: '🔐', 8: '⚛️', 9: '🤫', 10: '🎓', 11: '🦐', 12: '🌟',
+                    13: '💃', 14: '🧬', 15: '🚀', 16: '🧠', 17: '💔', 18: '🤔',
+                    19: '👻', 20: '🖕', 21: '🏛️', 22: '⏰', 23: '⚔️', 24: '💪', 25: '🕊️'
+                };
+                
+                document.getElementById('modalTitle').innerHTML = `${bookEmojis[book.id] || '📖'} ${book.name}`;
+                document.getElementById('modalBody').innerHTML = `
+                    <div class="detail-row">
+                        <div class="detail-label" data-testid="detail-label-id">📌 Book ID:</div>
+                        <div class="detail-value" data-testid="detail-value-id">${book.id}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label" data-testid="detail-label-name">📖 Name:</div>
+                        <div class="detail-value" data-testid="detail-value-name">${book.name}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label" data-testid="detail-label-author">✍️ Author:</div>
+                        <div class="detail-value" data-testid="detail-value-author">${book.author}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label" data-testid="detail-label-type">📚 Type:</div>
+                        <div class="detail-value" data-testid="detail-value-type"><span class="badge ${book.type}">${book.type}</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label" data-testid="detail-label-price">💰 Price:</div>
+                        <div class="detail-value" data-testid="detail-value-price">$${book.price.toFixed(2)}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label" data-testid="detail-label-stock">📦 Stock:</div>
+                        <div class="detail-value" data-testid="detail-value-stock">${book['current-stock']} units</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label" data-testid="detail-label-available">✅ Available:</div>
+                        <div class="detail-value" data-testid="detail-value-available"><span class="badge ${book.available ? 'available' : 'unavailable'}">${book.available ? '✅ Yes' : '❌ No'}</span></div>
+                    </div>
+                `;
+                
+                document.getElementById('bookModal').classList.add('show');
+            } catch (err) {
+                showAlert('❌ Error loading book details', 'error');
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('bookModal').classList.remove('show');
+        }
+
+        async function createOrder() {
+            if (!token) {
+                showAlert('❌ Please register first to get a token', 'error');
+                return;
+            }
+            
+            const bookId = document.getElementById('orderBookId').value;
+            const customerName = document.getElementById('orderCustomerName').value;
+            
+            if (!bookId || !customerName) {
+                showAlert('❌ Please fill in all fields', 'error');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/orders`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ bookId: parseInt(bookId), customerName })
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    showAlert(`✅ Order created! ID: ${data.orderId}`);
+                    document.getElementById('orderBookId').value = '';
+                    document.getElementById('orderCustomerName').value = '';
+                    loadOrders();
+                } else {
+                    showAlert('❌ ' + data.error, 'error');
+                }
+            } catch (err) {
+                showAlert('❌ Error: ' + err.message, 'error');
+            }
+        }
+
+        async function loadOrders() {
+            if (!token) {
+                document.getElementById('ordersList').innerHTML = '<li style="text-align: center; color: #718096; padding: 20px;">Please register first to view orders</li>';
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/orders`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const orders = await res.json();
+                
+                if (orders.length === 0) {
+                    document.getElementById('ordersList').innerHTML = '<li style="text-align: center; color: #718096; padding: 20px;">No orders yet</li>';
+                    return;
+                }
+                
+                const html = orders.map(order => `
+                    <li class="order-item" data-testid="order-item-${order.id}">
+                        <div>
+                            <strong data-testid="order-id-${order.id}">Order #${order.id}</strong><br>
+                            <span data-testid="order-book-${order.id}">Book ID: ${order.bookId}</span> | 
+                            <span data-testid="order-customer-${order.id}">Customer: ${order.customerName}</span><br>
+                            <small style="color: #718096;">Created: ${new Date(order.timestamp).toLocaleString()}</small>
+                        </div>
+                        <div style="display: flex; gap: 10px;">
+                            <button onclick="updateOrder('${order.id}')" data-testid="edit-order-${order.id}" class="secondary">✏️ Edit</button>
+                            <button class="danger" onclick="deleteOrder('${order.id}')" data-testid="delete-order-${order.id}">🗑️ Delete</button>
+                        </div>
+                    </li>
+                `).join('');
+                
+                document.getElementById('ordersList').innerHTML = html;
+            } catch (err) {
+                showAlert('❌ Error loading orders', 'error');
+            }
+        }
+
+        async function updateOrder(orderId) {
+            try {
+                const res = await fetch(`${API_URL}/orders/${orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const order = await res.json();
+                
+                document.getElementById('editOrderId').value = order.id;
+                document.getElementById('editBookId').value = order.bookId;
+                document.getElementById('editCustomerName').value = order.customerName;
+                document.getElementById('orderModal').classList.add('show');
+            } catch (err) {
+                showAlert('❌ Error loading order', 'error');
+            }
+        }
+
+        async function saveOrderUpdate() {
+            const orderId = document.getElementById('editOrderId').value;
+            const newName = document.getElementById('editCustomerName').value;
+            
+            if (!newName.trim()) {
+                showAlert('❌ Customer name is required', 'error');
+                return;
+            }
+            
+            try {
+                const res = await fetch(`${API_URL}/orders/${orderId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ customerName: newName })
+                });
+                
+                if (res.ok) {
+                    showAlert('✅ Order updated!');
+                    closeOrderModal();
+                    loadOrders();
+                } else {
+                    showAlert('❌ Error updating order', 'error');
+                }
+            } catch (err) {
+                showAlert('❌ Error: ' + err.message, 'error');
+            }
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').classList.remove('show');
+        }
+
+        async function deleteOrder(orderId) {
+            try {
+                const res = await fetch(`${API_URL}/orders/${orderId}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const order = await res.json();
+                
+                document.getElementById('deleteOrderId').textContent = order.id;
+                document.getElementById('deleteBookId').textContent = order.bookId;
+                document.getElementById('deleteCustomerName').textContent = order.customerName;
+                window.currentDeleteOrderId = orderId;
+                document.getElementById('deleteModal').classList.add('show');
+            } catch (err) {
+                showAlert('❌ Error loading order', 'error');
+            }
+        }
+
+        async function confirmDelete() {
+            const orderId = window.currentDeleteOrderId;
+            
+            try {
+                const res = await fetch(`${API_URL}/orders/${orderId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                
+                if (res.ok) {
+                    showAlert('✅ Order deleted!');
+                    closeDeleteModal();
+                    loadOrders();
+                } else {
+                    showAlert('❌ Error deleting order', 'error');
+                }
+            } catch (err) {
+                showAlert('❌ Error: ' + err.message, 'error');
+            }
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.remove('show');
+            window.currentDeleteOrderId = null;
+        }
+
+        async function resetStock() {
+            try {
+                const res = await fetch(`${API_URL}/reset`, { method: 'POST' });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    showAlert('✅ ' + data.message);
+                    loadBooks();
+                } else {
+                    showAlert('❌ Error resetting stock', 'error');
+                }
+            } catch (err) {
+                showAlert('❌ Error: ' + err.message, 'error');
+            }
+        }
+
+        // Load books on page load
+        loadBooks();
+    </script>
+</body>
+</html>

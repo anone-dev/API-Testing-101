@@ -1,58 +1,186 @@
-# How to host Swagger API documentation with GitHub Pages
-[<img alt="The blog of Peter Evans: How to Host Swagger Documentation With Github Pages" title="View blog post" src="https://peterevans.dev/img/blog-published-badge.svg">](https://peterevans.dev/posts/how-to-host-swagger-docs-with-github-pages/)
+# API Testing 101 - Simple Books API
 
-This repository is a template for using the [Swagger UI](https://github.com/swagger-api/swagger-ui) to dynamically generate beautiful documentation for your API and host it for free with GitHub Pages.
+โปรเจกต์สำหรับเรียนรู้และฝึกทดสอบ API โดยใช้ Simple Books API พร้อม Local Mock Server และ Modern Web UI
 
-The template will periodically auto-update the Swagger UI dependency and create a pull request. See the [GitHub Actions workflow here](.github/workflows/update-swagger.yml).
+**Developed by:** Anan.Ph : QA-CoE | 2026-02-17
 
-The example API specification used by this repository can be seen hosted at [https://peter-evans.github.io/swagger-github-pages](https://peter-evans.github.io/swagger-github-pages/).
+---
 
-## Steps to use this template
+## 📚 เนื้อหาในโปรเจกต์
 
-1. Click the `Use this template` button above to create a new repository from this template.
+### 1. **Swagger API Documentation** (GitHub Pages)
+API documentation ที่โฮสต์บน GitHub Pages สำหรับ Simple Books API
+- **Live Demo**: [https://peter-evans.github.io/swagger-github-pages](https://peter-evans.github.io/swagger-github-pages/)
+- ใช้ Swagger UI แสดง API specification
+- Auto-update Swagger UI dependency ผ่าน GitHub Actions
 
-2. Go to the settings for your repository at `https://github.com/{github-username}/{repository-name}/settings` and enable GitHub Pages.
+### 2. **Local Mock Server** (`books-local/`)
+Mock API Server พร้อม Modern Web UI สำหรับทดสอบในเครื่อง Local
 
-    ![Headers](/screenshots/swagger-github-pages.png?raw=true)
-    
-3. Browse to the Swagger documentation at `https://{github-username}.github.io/{repository-name}/`.
+#### 🚀 Quick Start
 
+**Windows:**
+```cmd
+cd books-local
 
-## Steps to manually configure in your own repository
+# PowerShell
+.\start.bat
 
-1. Download the latest stable release of the Swagger UI [here](https://github.com/swagger-api/swagger-ui/releases).
+# CMD
+start.bat
+```
 
-2. Extract the contents and copy the "dist" directory to the root of your repository.
+**macOS / Linux:**
+```bash
+cd books-local
+chmod +x start.sh
+./start.sh
+```
 
-3. Move the file "index.html" from the directory "dist" to the root of your repository.
-    ```
-    mv dist/index.html .
-    ```
-    
-4. Copy the YAML specification file for your API to the root of your repository.
+#### ✨ Features
 
-5. Edit [dist/swagger-initializer.js](dist/swagger-initializer.js) and change the `url` property to reference your local YAML file. 
-    ```javascript
-        window.ui = SwaggerUIBundle({
-            url: "swagger.yaml",
-        ...
-    ```
-    Then fix any references to files in the "dist" directory.
-    ```html
-    ...
-    <link rel="stylesheet" type="text/css" href="dist/swagger-ui.css" >
-    <link rel="icon" type="image/png" href="dist/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="dist/favicon-16x16.png" sizes="16x16" />    
-    ...
-    <script src="dist/swagger-ui-bundle.js"> </script>
-    <script src="dist/swagger-ui-standalone-preset.js"> </script>    
-    ...
-    ```
-    
-6. Go to the settings for your repository at `https://github.com/{github-username}/{repository-name}/settings` and enable GitHub Pages.
+- 📖 **25 Books** - Fiction และ Non-Fiction พร้อม emoji covers
+- 🎨 **6 Color Themes** - เลือกชุดสีได้ตามใจชอบ
+- 🔐 **Authentication** - Bearer Token authentication
+- 📦 **Stock Management** - ระบบจัดการสต็อกอัตโนมัติ
+- 🔄 **Reset Stock** - รีเซ็ตสต็อกโดยไม่ต้อง restart server
+- 🛒 **Orders CRUD** - สร้าง, อ่าน, แก้ไข, ลบ orders
+- 🐛 **Intentional Bug** - Book ID 3 สามารถสั่งซื้อได้แม้สต็อกหมด (สำหรับทดสอบ)
+- 🎭 **Playwright Ready** - มี data-testid attributes สำหรับ automation testing
+- 🌐 **Modern Web UI** - Single-page application พร้อม gradient backgrounds
+- 📄 **Swagger UI** - API documentation แบบ interactive
 
-    ![Headers](/screenshots/swagger-github-pages.png?raw=true)
-    
-7. Browse to the Swagger documentation at `https://{github-username}.github.io/{repository-name}/`.
+#### 📂 ไฟล์สำคัญ
 
-   The example API specification used by this repository can be seen hosted at [https://peter-evans.github.io/swagger-github-pages](https://peter-evans.github.io/swagger-github-pages/).
+```
+books-local/
+├── start.bat              # Windows startup script
+├── start.sh               # macOS/Linux startup script
+├── app.py                 # Flask API server
+├── ui.html                # Modern Web UI
+├── api-docs.html          # Swagger UI documentation
+├── swagger-local.yaml     # OpenAPI specification
+├── requirements.txt       # Python dependencies
+└── README.md              # คู่มือการใช้งานแบบละเอียด
+```
+
+#### 🌐 URLs
+
+- **API Server**: http://localhost:5000
+- **Web UI**: http://localhost:8000/ui.html
+- **API Docs**: http://localhost:8000/api-docs.html
+
+#### 📖 API Endpoints
+
+- `GET /status` - ตรวจสอบสถานะ API
+- `GET /books` - ดูรายการหนังสือ (รองรับ `?type=fiction|non-fiction&limit=1-20`)
+- `GET /books/:id` - ดูรายละเอียดหนังสือ
+- `POST /api-clients` - ลงทะเบียนและรับ access token
+- `POST /orders` - สร้าง order (ต้องมี token)
+- `GET /orders` - ดูรายการ orders (ต้องมี token)
+- `GET /orders/:id` - ดูรายละเอียด order (ต้องมี token)
+- `PATCH /orders/:id` - แก้ไข order (ต้องมี token)
+- `DELETE /orders/:id` - ลบ order (ต้องมี token)
+- `POST /reset` - รีเซ็ตสต็อกหนังสือ
+
+---
+
+## 🔧 การตั้งค่า GitHub Pages (สำหรับ Swagger UI)
+
+### วิธีที่ 1: ใช้ Template
+
+1. คลิก `Use this template` เพื่อสร้าง repository ใหม่
+2. ไปที่ Settings → Pages
+3. เปิดใช้งาน GitHub Pages
+4. เข้าดูได้ที่ `https://{username}.github.io/{repository-name}/`
+
+### วิธีที่ 2: ตั้งค่าเอง
+
+1. Download [Swagger UI](https://github.com/swagger-api/swagger-ui/releases)
+2. Copy "dist" directory มาที่ root ของ repository
+3. ย้าย `index.html` จาก dist มาที่ root
+4. Copy `swagger.yaml` มาที่ root
+5. แก้ไข `dist/swagger-initializer.js`:
+   ```javascript
+   window.ui = SwaggerUIBundle({
+       url: "swagger.yaml",
+       ...
+   ```
+6. แก้ไข path ใน `index.html` ให้ชี้ไปที่ `dist/`
+7. เปิดใช้งาน GitHub Pages ใน Settings
+
+---
+
+## 📝 การใช้งาน
+
+### ทดสอบด้วย Web UI (แนะนำ)
+1. รัน `start.bat` (Windows) หรือ `./start.sh` (macOS/Linux)
+2. เปิด browser ที่ http://localhost:8000/ui.html
+3. ลงทะเบียนเพื่อรับ token
+4. ทดสอบ Books และ Orders ผ่าน UI
+
+### ทดสอบด้วย curl
+
+```bash
+# ตรวจสอบสถานะ
+curl http://localhost:5000/status
+
+# ดูรายการหนังสือ
+curl http://localhost:5000/books?type=fiction&limit=5
+
+# ลงทะเบียน
+curl -X POST http://localhost:5000/api-clients \
+  -H "Content-Type: application/json" \
+  -d '{"clientEmail":"test@example.com","clientName":"Test User"}'
+
+# สร้าง order
+curl -X POST http://localhost:5000/orders \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"bookId":1,"customerName":"John Doe"}'
+```
+
+---
+
+## 🧪 Testing Features
+
+### Stock Management Testing
+1. สั่งซื้อหนังสือจนสต็อกหมด
+2. ตรวจสอบว่า `available` เปลี่ยนเป็น `false`
+3. ลองสั่งซื้อหนังสือที่หมดสต็อก (ควรได้ error)
+4. **Bug**: ลองสั่งซื้อ Book ID 3 ตอนสต็อกหมด (จะสั่งได้!)
+5. กดปุ่ม "Reset Stock" เพื่อรีเซ็ต
+
+### Playwright Automation
+ทุก element มี `data-testid` attributes:
+- `data-testid="email-input"`
+- `data-testid="register-button"`
+- `data-testid="book-card-{id}"`
+- `data-testid="create-order-button"`
+- และอื่นๆ
+
+---
+
+## 🛠️ Technical Stack
+
+- **Backend**: Python Flask + CORS
+- **Frontend**: Vanilla JavaScript + Modern CSS
+- **API Docs**: Swagger UI + OpenAPI 3.0
+- **Testing**: Playwright-ready with data-testid
+- **Deployment**: GitHub Pages (Swagger UI)
+
+---
+
+## 📚 Resources
+
+- [Simple Books API (Live)](https://simple-books-api.glitch.me)
+- [Swagger UI Documentation](https://swagger.io/tools/swagger-ui/)
+- [OpenAPI Specification](https://swagger.io/specification/)
+- [Flask Documentation](https://flask.palletsprojects.com/)
+- [Playwright Testing](https://playwright.dev/)
+
+---
+
+## 📄 License
+
+This project is open source and available under the MIT License.
