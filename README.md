@@ -1,6 +1,6 @@
 # API Testing 101 - Simple Books API
 
-โปรเจกต์สำหรับเรียนรู้และฝึกทดสอบ API โดยใช้ Simple Books API พร้อม Local Mock Server และ Modern Web UI
+โปรเจกต์สำหรับเรียนรู้และฝึกทดสอบ API โดยใช้ Simple Books API พร้อม Local Mock Server, Modern Web UI และ Mobile App
 
 **Developed by:** Anan.Ph : QA-CoE | 2026-02-17
 
@@ -83,6 +83,53 @@ books-local/
 - `DELETE /orders/:id` - ลบ order (ต้องมี token)
 - `POST /reset` - รีเซ็ตสต็อกหนังสือ
 
+### 3. **Mobile App** (`books_mobile_app/`)
+Flutter mobile application สำหรับ Android และ iOS
+
+#### 🚀 Quick Start
+
+**Windows:**
+```cmd
+cd books_mobile_app
+run-simple.bat
+```
+
+**Build APK:**
+```cmd
+cd books_mobile_app
+build-apk.bat
+```
+
+#### ✨ Features
+
+- 📱 **Cross-Platform** - Android, iOS, Windows, Web
+- 🔐 **Authentication** - Register แลเ Login ด้วย token
+- 📝 **Token Management** - Copy/Paste token จาก clipboard
+- 📚 **Books Management** - ดู, ค้นหา, filter หนังสือ
+- 🛍️ **Orders CRUD** - สร้าง, ดู, แก้ไข, ลบ orders
+- 🤖 **Automation Ready** - มี keys สำหรับ Robot Framework + Appium
+- 🎨 **Modern UI** - Material Design พร้อม gradient backgrounds
+
+#### 📱 APK for Testing
+
+**Build:**
+```cmd
+cd books_mobile_app
+build-apk.bat
+```
+
+**Install:**
+```bash
+adb install build\app\outputs\flutter-apk\app-release.apk
+```
+
+**Appium Config:**
+- **App Package:** `com.example.books_mobile_app`
+- **App Activity:** `.MainActivity`
+- **Automation Name:** `UiAutomator2`
+
+ดูเพิ่มเติม: [books_mobile_app/README.md](books_mobile_app/README.md)
+
 ---
 
 ## 🔧 การตั้งค่า GitHub Pages (สำหรับ Swagger UI)
@@ -163,21 +210,45 @@ curl -X POST http://localhost:5000/orders \
 
 ## 🛠️ Technical Stack
 
-- **Backend**: Python Flask + CORS
-- **Frontend**: Vanilla JavaScript + Modern CSS
-- **API Docs**: Swagger UI + OpenAPI 3.0
-- **Testing**: Playwright-ready with data-testid
-- **Deployment**: GitHub Pages (Swagger UI)
+**Backend:**
+- Python Flask + CORS
+
+**Frontend:**
+- Vanilla JavaScript + Modern CSS (Web UI)
+- Flutter + Dart (Mobile App)
+
+**State Management:**
+- Provider (Flutter)
+
+**API Docs:**
+- Swagger UI + OpenAPI 3.0
+
+**Testing:**
+- Playwright-ready (Web UI)
+- Appium-ready (Mobile App)
+
+**Deployment:**
+- GitHub Pages (Swagger UI)
 
 ---
 
 ## 📚 Resources
 
+**API:**
 - [Simple Books API (Live)](https://simple-books-api.glitch.me)
 - [Swagger UI Documentation](https://swagger.io/tools/swagger-ui/)
 - [OpenAPI Specification](https://swagger.io/specification/)
+
+**Backend:**
 - [Flask Documentation](https://flask.palletsprojects.com/)
+
+**Frontend:**
 - [Playwright Testing](https://playwright.dev/)
+
+**Mobile:**
+- [Flutter Documentation](https://docs.flutter.dev/)
+- [Appium Documentation](http://appium.io/docs/en/latest/)
+- [Robot Framework](https://robotframework.org/)
 
 ---
 
