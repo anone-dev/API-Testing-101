@@ -7,6 +7,7 @@ import sys
 import webbrowser
 import threading
 import copy
+import getpass
 
 app = Flask(__name__)
 CORS(app)
@@ -170,10 +171,20 @@ def open_browser():
 if __name__ == '__main__':
     print("\n" + "="*60)
     print("  📚 Simple Books API - Standalone Server")
+    print("  👨💻 Developed by: Anan.Ph : QA-CoE | 2026-02-17")
+    print("="*60)
+    
+    PASSWORD = "qacoe"
+    while True:
+        pwd = getpass.getpass("\n  🔐 Enter password: ")
+        if pwd == PASSWORD:
+            break
+        print("  ❌ Incorrect password. Try again.")
+    
+    print("\n" + "="*60)
     print("  🌐 Server: http://localhost:5000")
     print("  🎨 Web UI: http://localhost:5000/ui.html")
     print("  📖 API Docs: http://localhost:5000/api-docs.html")
     print("="*60 + "\n")
-    # Clear localStorage on server start
     threading.Timer(1.5, open_browser).start()
     app.run(host='0.0.0.0', port=5000, debug=False)
