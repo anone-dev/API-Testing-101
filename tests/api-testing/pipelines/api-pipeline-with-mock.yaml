@@ -7,14 +7,22 @@ trigger:
     include:
       - tests/api-testing/**
 
+resources:
+  repositories:
+  - repository: templates
+    type: git
+    name: pipeline-templates
+    ref: refs/heads/main
+
 pool:
   name: 'qa-automation'
 
 variables:
+  - group: notification-config
   - name: workingDirectory
     value: '$(System.DefaultWorkingDirectory)/tests/api-testing'
   - name: mockServerDir
-    value: '$(System.DefaultWorkingDirectory)/tests/coe-app-demo'
+    value: '$(System.DefaultWorkingDirectory)/coe-app-demo'
   - name: mockServerPort
     value: '5000'
   - name: mockUiPort
@@ -73,3 +81,17 @@ stages:
               targetPath: '$(workingDirectory)/playwright-report'
               artifact: 'api-test-report'
               publishLocation: 'pipeline'
+
+          - template: templates/publish-test-results-artifacts.yaml@templates
+            parameters:
+              junitFile: '$(workingDirectory)/test-results/junit.xml'
+              reportPath: '$(workingDirectory)/playwright-report'
+              reportArtifactName: 'api-test-report'
+              statusArtifactName: 'job-status-noti'
+              jobName: 'RunTests'
+
+  - template: templates/sent-notification.yaml@templates
+    parameters:
+      dependsOn: 'API_Testing'
+      teamWebhookUrl: $(TEAMS_WEBHOOK_URL)
+      artifactName: 'job-status-noti'

@@ -113,7 +113,7 @@
 
 | PBI ID | Feature | Axons Test Scenario IDs |
 |--------|---------|-------------------------|
-| [12555](https://dev.azure.com/AXONS-Strategic-And-Digital-Transformation/coe-app-demo/_workitems/edit/12555) | FR-01: Health Check | 12569, 12570 |
+| [12555](https://dev.azure.com/AXONS-Strategic-And-Digital-Transformation/coe-app-demo/_workitems/edit/12555) | FR-01: Health Check | 12653, 12570 |
 | [12556](https://dev.azure.com/AXONS-Strategic-And-Digital-Transformation/coe-app-demo/_workitems/edit/12556) | FR-02: Authentication | 12571, 12572, 12573, 12574 |
 | [12557](https://dev.azure.com/AXONS-Strategic-And-Digital-Transformation/coe-app-demo/_workitems/edit/12557) | FR-03: Books Management | 12575, 12576, 12577, 12578, 12579, 12580, 12581 |
 | [12558](https://dev.azure.com/AXONS-Strategic-And-Digital-Transformation/coe-app-demo/_workitems/edit/12558) | FR-04: Orders Management | 12582, 12583, 12584, 12585, 12586, 12587, 12588, 12589, 12590, 12591 |

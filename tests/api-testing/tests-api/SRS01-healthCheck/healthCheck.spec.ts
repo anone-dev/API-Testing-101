@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test';
 test.describe('[PBI-12555] FR-01: Health Check', () => {
   // @Important: Critical
   // @Scenario: Success
-  test('[TC-12569] GET /status returns OK', async ({ request }) => {
+  test('[TC-12653] GET /status returns OK', async ({ request }) => {
     const url = '/status';
 
     console.log('=== REQUEST LOG ===');

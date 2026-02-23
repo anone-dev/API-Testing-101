@@ -7,7 +7,7 @@ Board: https://dev.azure.com/AXONS-Strategic-And-Digital-Transformation/coe-app-
 ## PBI 12555 — FR-01: Health Check
 | TC | Title | Axons Test Scenario ID |
 |---|---|---|
-| TC-01 | [API][Status][HealthCheck] GET /status returns OK | 12569 |
+| TC-01 | [API][Status][HealthCheck] GET /status returns OK | 12653 |
 | TC-02 | [API][Status][HealthCheck] GET /status has no-cache header | 12570 |
 
 ## PBI 12556 — FR-02: Authentication
@@ -60,4 +60,4 @@ Board: https://dev.azure.com/AXONS-Strategic-And-Digital-Transformation/coe-app-
 | TC-31 | [WEB][UI][Theme] Web UI supports 6 color themes | 12600 |
 
 ---
-Total: 31 Axons Test Scenario work items | IDs: 12569–12600 (ยกเว้น 12594 ที่ข้ามไป)
+Total: 31 Axons Test Scenario work items | IDs: 12570–12600 (ยกเว้น 12594 ที่ข้ามไป) + 12653 (TC-01 สร้างใหม่)
