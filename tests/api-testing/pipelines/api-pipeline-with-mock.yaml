@@ -1,0 +1,75 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - tests/api-testing/**
+
+pool:
+  name: 'qa-automation'
+
+variables:
+  - name: workingDirectory
+    value: '$(System.DefaultWorkingDirectory)/tests/api-testing'
+  - name: mockServerDir
+    value: '$(System.DefaultWorkingDirectory)/tests/coe-app-demo'
+  - name: mockServerPort
+    value: '5000'
+  - name: mockUiPort
+    value: '8000'
+
+stages:
+  - stage: API_Testing
+    displayName: 'API Testing with Mock Server'
+    jobs:
+      - job: RunTests
+        displayName: 'Start Mock Server & Run API Tests'
+        steps:
+
+          - script: |
+              chmod +x $(mockServerDir)/BooksAPI-Linux
+              HEADLESS=1 $(mockServerDir)/BooksAPI-Linux &
+              echo $! > /tmp/mock_server.pid
+              sleep 3
+              curl -s http://localhost:$(mockServerPort)/status | python3 -m json.tool
+            displayName: 'Start Mock Server & Web UI'
+
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '20.x'
+            displayName: 'Install Node.js'
+
+          - script: |
+              cd $(workingDirectory)
+              npm ci
+            displayName: 'Install dependencies'
+
+          - script: |
+              cd $(workingDirectory)
+              npm run api:sit:all:cliMode
+            displayName: 'Run API Tests (sit)'
+            env:
+              API_BASE_URL: 'http://localhost:$(mockServerPort)'
+              WEB_BASE_URL: 'http://localhost:$(mockUiPort)'
+              ENV: 'sit'
+
+          - script: |
+              kill $(cat /tmp/mock_server.pid) 2>/dev/null || true
+            displayName: 'Stop Mock Server'
+            condition: always()
+
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '$(workingDirectory)/test-results/junit.xml'
+              testRunTitle: 'API Test Results'
+
+          - task: PublishPipelineArtifact@1
+            condition: succeededOrFailed()
+            inputs:
+              targetPath: '$(workingDirectory)/playwright-report'
+              artifact: 'api-test-report'
+              publishLocation: 'pipeline'

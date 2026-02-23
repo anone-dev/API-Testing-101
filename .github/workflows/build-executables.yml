@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
         include:
           - os: windows-latest
             output_name: BooksAPI-Windows.exe
@@ -15,6 +15,9 @@ jobs:
           - os: macos-latest
             output_name: BooksAPI-macOS
             artifact_name: BooksAPI-macOS
+          - os: ubuntu-latest
+            output_name: BooksAPI-Linux
+            artifact_name: BooksAPI-Linux
     
     runs-on: ${{ matrix.os }}
     
@@ -30,6 +33,12 @@ jobs:
       working-directory: books-local
       run: pip install -r build-requirements.txt
     
+    - name: Build Linux
+      if: matrix.os == 'ubuntu-latest'
+      working-directory: books-local
+      run: |
+        pyinstaller --onefile --add-data "ui.html:." --add-data "api-docs.html:." --add-data "swagger-local.yaml:." --name "BooksAPI-Linux" app_standalone.py
+
     - name: Build Windows
       if: matrix.os == 'windows-latest'
       working-directory: books-local

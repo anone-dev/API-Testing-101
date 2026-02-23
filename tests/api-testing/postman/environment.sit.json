@@ -1,0 +1,26 @@
+{
+  "id": "sit-environment",
+  "name": "SIT Environment",
+  "values": [
+    {
+      "key": "baseUrl",
+      "value": "https://sit-api.example.com",
+      "enabled": true
+    },
+    {
+      "key": "postTitle",
+      "value": "SIT Test Post",
+      "enabled": true
+    },
+    {
+      "key": "postBody",
+      "value": "SIT environment test data",
+      "enabled": true
+    },
+    {
+      "key": "userId",
+      "value": "100",
+      "enabled": true
+    }
+  ]
+}

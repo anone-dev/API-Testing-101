@@ -1,0 +1,41 @@
+# Robot Framework
+log.html
+report.html
+output.xml
+results/
+screenshots/
+*.pyc
+__pycache__/
+
+# Python
+*.py[cod]
+*$py.class
+venv/
+env/
+.pytest_cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment - Only ignore local environment files
+.env.android.local
+.env.ios.local
+
+# Keep SIT and UAT environment files
+# .env (Global) - tracked
+# .env.android.sit - tracked
+# .env.android.uat - tracked
+# .env.ios.sit - tracked
+# .env.ios.uat - tracked
+
+# Test artifacts
+*.log
+*.tmp

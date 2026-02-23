@@ -1,0 +1,26 @@
+USERS:
+  valid:
+    username: "iosuatuser@example.com"
+    password: "iOSUAT@1234"
+  admin:
+    username: "iosuatadmin@example.com"
+    password: "iOSUATAdmin@1234"
+  invalid:
+    username: "invalid@example.com"
+    password: "wrongpassword"
+
+PAYMENT:
+  transfer:
+    amount: "500"
+    recipient: "0898765432"
+    note: "iOS UAT test transfer"
+  favorites:
+    name: "Jane Smith"
+    account: "9876543210"
+
+PROFILE:
+  user:
+    firstName: "iOS UAT"
+    lastName: "User"
+    email: "iosuatuser@example.com"
+    phone: "0898765432"

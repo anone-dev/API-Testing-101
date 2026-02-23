@@ -1,0 +1,58 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - tests/web-testing/**
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: workingDirectory
+    value: '$(System.DefaultWorkingDirectory)/tests/web-testing'
+
+stages:
+  - stage: Web_Testing
+    displayName: 'Web Testing'
+    jobs:
+      - job: RunTests
+        displayName: 'Run Web Tests'
+        steps:
+          - task: NodeTool@0
+            inputs:
+              versionSpec: '18.x'
+            displayName: 'Install Node.js'
+
+          - script: |
+              cd $(workingDirectory)
+              npm ci
+            displayName: 'Install dependencies'
+
+          - script: |
+              cd $(workingDirectory)
+              npx playwright install --with-deps chromium
+            displayName: 'Install Playwright browsers'
+
+          - script: |
+              cd $(workingDirectory)
+              npm run test
+            displayName: 'Run Web Tests'
+            env:
+              ENV: 'dev'
+
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '$(workingDirectory)/test-results/junit.xml'
+              testRunTitle: 'Web Test Results'
+
+          - task: PublishPipelineArtifact@1
+            condition: succeededOrFailed()
+            inputs:
+              targetPath: '$(workingDirectory)/playwright-report'
+              artifact: 'web-test-report'
+              publishLocation: 'pipeline'

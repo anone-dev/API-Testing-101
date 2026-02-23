@@ -1,0 +1,293 @@
+# ============================================
+# QA Automation Emulator Verification Pipeline
+# ============================================
+
+# Auto trigger on main branch push - Commented out for manual testing
+# trigger:
+#   branches:
+#     include:
+#       - main
+
+# Example schedule to run Mon-Fri at 08:30 Bangkok Time
+schedules:
+- cron: '30 1 * * 1-5'
+  displayName: 'Run Mon-Fri at 08:30 Bangkok Time'
+  branches:
+    include:
+    - main
+  always: true
+
+resources:
+  repositories:
+  - repository: templates
+    type: git
+    name: pipeline-templates
+    ref: refs/heads/main
+
+pool:
+  name: 'qa-automation'
+
+variables:
+- group: notification-config
+
+stages:
+- stage: Verify_Emulators
+  displayName: 'Verify Android Emulators'
+  jobs:
+  - job: Emulator_Verification
+    displayName: 'Run Emulator Verification'
+
+    steps:
+    # Step 1: Environment check
+    - script: |
+        #!/bin/bash
+        
+        # === Function to print environment info ===
+        print_row() {
+            IFS=$'\n' read -rd '' -a lines <<<"$2"
+            printf "| %-30s | %-40s |\n" "$1" "${lines[0]}"
+            for ((i=1; i<${#lines[@]}; i++)); do
+                printf "| %-30s | %-40s |\n" "" "${lines[$i]}"
+            done
+        }
+        
+        print_separator() {
+            printf "|--------------------------------|------------------------------------------|\n"
+        }
+        
+        echo ""
+        echo "===== QA-Automation Environment Version Summary ====="
+        print_separator
+        print_row "Tool" "Version"
+        print_separator
+        
+        print_row "Python" "$(python3 --version 2>&1)"
+        print_row "pip" "$(pip3 --version 2>&1)"
+        print_row "Node.js" "$(node -v 2>&1)"
+        print_row "npm" "$(npm -v 2>&1)"
+        print_row "Newman" "$(newman -v 2>&1 || echo 'Not Installed')"
+        newman_reporter=$(npm list -g newman-reporter-htmlextra --depth=0 2>/dev/null | grep newman-reporter-htmlextra | awk -F@ '{print $2}')
+        print_row "Newman Reporter htmlextra" "${newman_reporter:-Not Installed}"
+        
+        print_row "Robot Framework" "$(robot --version 2>&1 | head -1)"
+        print_row "SeleniumLibrary" "$(pip3 show robotframework-seleniumlibrary 2>/dev/null | grep Version | awk '{print $2}' || echo 'Not Installed')"
+        print_row "Requests" "$(pip3 show robotframework-requests 2>/dev/null | grep Version | awk '{print $2}' || echo 'Not Installed')"
+        print_row "DatabaseLibrary" "$(pip3 show robotframework-databaselibrary 2>/dev/null | grep Version | awk '{print $2}' || echo 'Not Installed')"
+        
+        cypress_ver=$(cypress version 2>/dev/null | grep 'Cypress binary version' | awk -F: '{print $2}' | xargs)
+        print_row "Cypress" "${cypress_ver:-Not Installed}"
+        
+        print_row "Playwright" "$(npx playwright --version 2>&1 || echo 'Not Installed')"
+        
+        jmeter_version=$(jmeter --version 2>&1 | grep -Eo 'Apache JMeter.*|[0-9]+\.[0-9]+' | head -1)
+        print_row "JMeter" "${jmeter_version:-Not Installed}"
+        
+        print_row "PostgreSQL Client" "$(psql --version 2>&1 || echo 'Not Installed')"
+        psycopg2_ver=$(python3 -c "import psycopg2; print(psycopg2.__version__)" 2>/dev/null)
+        print_row "psycopg2" "${psycopg2_ver:-Not Installed}"
+        
+        if [ -d "/opt/oracle" ]; then
+            oracle_versions=$(ls /opt/oracle | paste -sd '\n' -)
+        else
+            oracle_versions="Not Found in /opt/oracle"
+        fi
+        print_row "Oracle Instant Client" "$oracle_versions"
+        
+        sqlplus_versions=$(sqlplus -v 2>&1 | grep -E 'Release|Version')
+        print_row "SQL*Plus" "${sqlplus_versions:-Not Found}"
+        
+        print_row "Google Chrome" "$(google-chrome --version 2>&1 || echo 'Not Installed')"
+        print_separator
+        
+        echo ""
+        echo "===== Android & Appium Environment ====="
+        print_separator
+        print_row "Tool" "Version"
+        print_separator
+        
+        print_row "Android SDK" "$(sdkmanager --version 2>&1 | head -1 || echo 'Not Installed')"
+        print_row "Android Platform Tools" "$(adb --version 2>&1 | head -1 || echo 'Not Installed')"
+        print_row "Android Emulator" "$(emulator -version 2>&1 | head -1 || echo 'Not Installed')"
+        print_row "Appium" "$(appium --version 2>&1 || echo 'Not Installed')"
+        appium_uia2=$(appium driver list --installed 2>/dev/null | grep uiautomator2 | awk '{print $2}' || echo 'Not Installed')
+        print_row "Appium UIAutomator2" "${appium_uia2:-Not Installed}"
+        print_separator
+
+        echo ""
+        echo ">>> [ANDROID] Available Emulators:"
+        echo "------------------------------------"
+        emulator -list-avds 2>/dev/null || echo "No emulators found"
+        
+        echo ""
+        echo ">>> [ANDROID] Emulator Details (Name & OS Version):"
+        echo "----------------------------------------------------"
+        for avd in $(emulator -list-avds 2>/dev/null); do
+            echo "AVD Name: $avd"
+            avd_ini="$HOME/.android/avd/${avd}.ini"
+            avd_config="$HOME/.android/avd/${avd}.avd/config.ini"
+            
+            if [ -f "$avd_config" ]; then
+                api_level=$(grep "image.sysdir.1" "$avd_config" | grep -oP 'android-\K[0-9]+' || echo "Unknown")
+                target=$(grep "tag.id" "$avd_config" | cut -d'=' -f2 | tr -d ' ' || echo "Unknown")
+                echo "  - API Level: $api_level"
+                echo "  - Target: $target"
+            fi
+            echo ""
+        done
+        
+        echo ""
+        echo "============================================================"
+        echo "End of Environment Check"
+        echo "============================================================"
+      displayName: 'Check Environment Dependencies'
+      continueOnError: true
+
+    # Step 2: Run emulator verification
+    - script: |
+        echo "Starting Android Emulator Verification..."
+        echo ""
+        
+        # Check KVM support
+        echo "🔍 Checking hardware acceleration support..."
+        if [ -e /dev/kvm ]; then
+            echo "✅ KVM available"
+            KVM_AVAILABLE=true
+        else
+            echo "⚠️  KVM not available - emulator will use software rendering (slower)"
+            KVM_AVAILABLE=false
+        fi
+        echo ""
+        
+        # Check available resources
+        echo "📊 System Resources:"
+        echo "CPU: $(nproc) cores"
+        echo "Memory: $(free -h | grep Mem | awk '{print $2}')"
+        echo "Disk Space: $(df -h /root/.android/avd | tail -1 | awk '{print $4" available"}')"
+        echo ""
+        
+        run_verification() {
+            AVD=$1
+            EXPECTED_RES=$2
+            echo "--------------------------------------------------"
+            echo "🚀 Testing AVD: $AVD"
+            echo "--------------------------------------------------"
+            
+            if ! emulator -list-avds 2>/dev/null | grep -q "^${AVD}$"; then
+                echo "❌ ERROR: AVD '$AVD' not found!"
+                echo "Available AVDs:"
+                emulator -list-avds 2>/dev/null
+                return 1
+            fi
+            
+            # Start Emulator in Background with verbose logging
+            echo "Starting emulator process..."
+            # Try simple command first, fallback to swiftshader if needed
+            emulator -avd $AVD -no-window -no-audio -no-boot-anim -verbose > /tmp/emulator_${AVD}.log 2>&1 &
+            EMU_PID=$!
+            echo "Emulator PID: $EMU_PID"
+            
+            # Give emulator time to initialize
+            sleep 10
+            
+            # Check if emulator process is still running
+            if ! kill -0 $EMU_PID 2>/dev/null; then
+                echo "❌ ERROR: Emulator process died immediately!"
+                echo "Last 20 lines of emulator log:"
+                tail -20 /tmp/emulator_${AVD}.log
+                return 1
+            fi
+            
+            # Wait for ADB with timeout
+            echo "Waiting for device (timeout: 2 minutes)..."
+            timeout 120 adb wait-for-device
+            ADB_RESULT=$?
+            
+            if [ $ADB_RESULT -ne 0 ]; then
+                echo "❌ ERROR: ADB connection timeout!"
+                echo "Emulator log (last 30 lines):"
+                tail -30 /tmp/emulator_${AVD}.log
+                kill -9 $EMU_PID 2>/dev/null
+                return 1
+            fi
+            
+            echo "✅ ADB connected!"
+            
+            # Wait for Boot Completion (Max 180s = 3 mins)
+            echo "Waiting for boot completion (timeout: 3 minutes)..."
+            boot_completed=""
+            count=0
+            while [ "$boot_completed" != "1" ]; do
+                sleep 5
+                boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+                count=$((count+1))
+                echo -n "."
+                if [ $count -gt 36 ]; then # 36 * 5s = 180s = 3 mins
+                    echo ""
+                    echo "❌ Timeout! Emulator failed to boot within 3 minutes."
+                    echo "Emulator log (last 50 lines):"
+                    tail -50 /tmp/emulator_${AVD}.log
+                    kill -9 $EMU_PID 2>/dev/null
+                    return 1
+                fi
+            done
+            echo ""
+            echo "✅ Boot completed!"
+            
+            # Verify Resolution
+            CURRENT_RES=$(adb shell wm size)
+            echo "📊 Resolution: $CURRENT_RES"
+            if [[ "$CURRENT_RES" == *"$EXPECTED_RES"* ]]; then
+                echo "✅ PASS: Resolution matches ($EXPECTED_RES)"
+            else
+                echo "❌ FAIL: Resolution mismatch (Expected: $EXPECTED_RES)"
+            fi
+            
+            # Get additional device info
+            echo "📱 Device Info:"
+            echo "  Model: $(adb shell getprop ro.product.model)"
+            echo "  Android Version: $(adb shell getprop ro.build.version.release)"
+            echo "  API Level: $(adb shell getprop ro.build.version.sdk)"
+            
+            # Stop Emulator
+            echo "🛑 Stopping Emulator..."
+            adb emu kill
+            sleep 10
+            
+            # Ensure process is killed
+            kill -9 $EMU_PID 2>/dev/null
+            
+            echo "Done."
+            echo ""
+        }
+        
+        # Test 1: Mobile
+        run_verification "Mobile_Pixel8Pro" "1344x2992" || echo "⚠️  Mobile test failed"
+        
+        # Test 2: Tablet
+        run_verification "Tablet_PixelTablet" "1600" || echo "⚠️  Tablet test failed"
+        
+        # Test 3: POS
+        run_verification "POS_IMIN_SWAN1" "1920" || echo "⚠️  POS test failed"
+        
+        echo ""
+        echo "============================================"
+        echo "Emulator Verification Completed"
+        echo "============================================"
+      displayName: 'Verify Android Emulators'
+      continueOnError: true
+
+    # Commented notification & artifact publishing
+    # - template: templates/publish-test-results-artifacts.yaml@templates
+    #   parameters:
+    #     junitFile: 'test-results/junit.xml'
+    #     reportPath: 'playwright-report'
+    #     reportArtifactName: 'emulator-verification-report'
+    #     statusArtifactName: 'job-status-noti'
+    #     jobName: 'Emulator_Verification'
+
+# Commented out notification template
+# - template: templates/sent-notification.yaml@templates
+#   parameters:
+#     dependsOn: 'Verify_Emulators'
+#     teamWebhookUrl: $(TEAMS_WEBHOOK_URL)
+#     artifactName: 'job-status-noti'

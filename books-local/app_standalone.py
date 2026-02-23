@@ -80,14 +80,26 @@ def status():
     response.headers['Expires'] = '0'
     return response
 
+def _validate_token(auth):
+    if not auth or not auth.startswith('Bearer '):
+        return None
+    token = auth.split(' ', 1)[1]
+    valid = {v['token'] for v in clients.values()}
+    return token if token in valid else None
+
 @app.route('/api-clients', methods=['POST'])
 def register_client():
     data = request.json
     email = data.get('clientEmail')
+    name = data.get('clientName')
+    if not email:
+        return jsonify({"error": "clientEmail is required."}), 400
+    if not name:
+        return jsonify({"error": "clientName is required."}), 400
     if email in clients:
         return jsonify({"error": "API client already registered. Try a different email."}), 409
     token = uuid.uuid4().hex + uuid.uuid4().hex
-    clients[email] = {"token": token, "name": data.get('clientName')}
+    clients[email] = {"token": token, "name": name}
     return jsonify({"accessToken": token}), 201
 
 @app.route('/books')
@@ -111,10 +123,13 @@ def handle_orders():
     auth = request.headers.get('Authorization')
     if not auth or not auth.startswith('Bearer '):
         return jsonify({"error": "Missing Authorization header."}), 401
-    
+    token = _validate_token(auth)
+    if not token:
+        return jsonify({"error": "Invalid token."}), 401
+
     if request.method == 'GET':
-        return jsonify(list(orders.values()))
-    
+        return jsonify([o for o in orders.values() if o['createdBy'] == token])
+
     data = request.json
     book_id = data.get('bookId')
     book = next((b for b in books if b['id'] == book_id), None)
@@ -122,17 +137,17 @@ def handle_orders():
         return jsonify({"error": f"No book with id {book_id}"}), 404
     if book_id != 3 and book['current-stock'] <= 0:
         return jsonify({"error": "This book is not in stock. Try again later."}), 404
-    
+
     book['current-stock'] -= 1
     book['available'] = book['current-stock'] > 0
-    
+
     order_id = str(uuid.uuid4())[:21]
     orders[order_id] = {
         "id": order_id,
         "bookId": book_id,
         "customerName": data.get('customerName'),
         "quantity": 1,
-        "createdBy": auth.split(' ')[1][:64],
+        "createdBy": token[:64],
         "timestamp": int(datetime.now().timestamp() * 1000)
     }
     return jsonify({"created": True, "orderId": order_id}), 201
@@ -142,7 +157,9 @@ def handle_order(order_id):
     auth = request.headers.get('Authorization')
     if not auth or not auth.startswith('Bearer '):
         return jsonify({"error": "Missing Authorization header."}), 401
-    
+    if not _validate_token(auth):
+        return jsonify({"error": "Invalid token."}), 401
+
     if order_id not in orders:
         return jsonify({"error": f"No order with id {order_id}."}), 404
     
@@ -173,18 +190,23 @@ if __name__ == '__main__':
     print("  📚 Simple Books API - Standalone Server")
     print("  👨💻 Developed by: Anan.Ph : QA-CoE | 2026-02-17")
     print("="*60)
-    
-    PASSWORD = "qacoe"
-    while True:
-        pwd = getpass.getpass("\n  🔐 Enter password: ")
-        if pwd == PASSWORD:
-            break
-        print("  ❌ Incorrect password. Try again.")
-    
+
+    headless = '--headless' in sys.argv or os.environ.get('HEADLESS') == '1'
+
+    if not headless:
+        PASSWORD = "qacoe"
+        while True:
+            pwd = getpass.getpass("\n  🔐 Enter password: ")
+            if pwd == PASSWORD:
+                break
+            print("  ❌ Incorrect password. Try again.")
+
     print("\n" + "="*60)
     print("  🌐 Server: http://localhost:5000")
     print("  🎨 Web UI: http://localhost:5000/ui.html")
     print("  📖 API Docs: http://localhost:5000/api-docs.html")
     print("="*60 + "\n")
-    threading.Timer(1.5, open_browser).start()
+
+    if not headless:
+        threading.Timer(1.5, open_browser).start()
     app.run(host='0.0.0.0', port=5000, debug=False)

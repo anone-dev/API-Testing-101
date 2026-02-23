@@ -58,10 +58,15 @@ def status():
 def register_client():
     data = request.json
     email = data.get('clientEmail')
+    name = data.get('clientName')
+    if not email:
+        return jsonify({"error": "clientEmail is required."}), 400
+    if not name:
+        return jsonify({"error": "clientName is required."}), 400
     if email in clients:
         return jsonify({"error": "API client already registered. Try a different email."}), 409
     token = uuid.uuid4().hex + uuid.uuid4().hex
-    clients[email] = {"token": token, "name": data.get('clientName')}
+    clients[email] = {"token": token, "name": name}
     return jsonify({"accessToken": token}), 201
 
 @app.route('/books')
@@ -81,14 +86,26 @@ def get_book(book_id):
         book['available'] = book['current-stock'] > 0
     return jsonify(book) if book else (jsonify({"error": f"No book with id {book_id}"}), 404)
 
+def _validate_token(auth):
+    """Returns token string if valid, else None."""
+    if not auth or not auth.startswith('Bearer '):
+        return None
+    token = auth.split(' ', 1)[1]
+    valid_tokens = {v['token'] for v in clients.values()}
+    return token if token in valid_tokens else None
+
 @app.route('/orders', methods=['GET', 'POST'])
 def handle_orders():
     auth = request.headers.get('Authorization')
     if not auth or not auth.startswith('Bearer '):
         return jsonify({"error": "Missing Authorization header."}), 401
-    
+    token = _validate_token(auth)
+    if not token:
+        return jsonify({"error": "Invalid token."}), 401
+
     if request.method == 'GET':
-        return jsonify(list(orders.values()))
+        user_orders = [o for o in orders.values() if o['createdBy'] == token]
+        return jsonify(user_orders)
     
     data = request.json
     book_id = data.get('bookId')
@@ -121,6 +138,8 @@ def handle_order(order_id):
     auth = request.headers.get('Authorization')
     if not auth or not auth.startswith('Bearer '):
         return jsonify({"error": "Missing Authorization header."}), 401
+    if not _validate_token(auth):
+        return jsonify({"error": "Invalid token."}), 401
     
     if order_id not in orders:
         return jsonify({"error": f"No order with id {order_id}."}), 404

@@ -1,0 +1,39 @@
+{
+  "name": "web_ui",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:local": "cross-env ENV=local npx playwright test",
+    "test:uat": "cross-env ENV=uat npx playwright test",
+    "test:smoke": "npx playwright test --grep @smoke",
+    "test:smoke:local": "cross-env ENV=local npx playwright test --grep @smoke",
+    "test:smoke:uat": "cross-env ENV=uat npx playwright test --grep @smoke",
+    "test:regression": "npx playwright test --grep @regression",
+    "test:regression:local": "cross-env ENV=local npx playwright test --grep @regression",
+    "test:regression:uat": "cross-env ENV=uat npx playwright test --grep @regression",
+    "test:feature-1": "npx playwright test feature-1",
+    "test:feature-2": "npx playwright test feature-2",
+    "test:feature-3": "npx playwright test feature-3",
+    "test:feature-1:local": "cross-env ENV=local npx playwright test feature-1",
+    "test:feature-1:uat": "cross-env ENV=uat npx playwright test feature-1",
+    "test:feature-2:local": "cross-env ENV=local npx playwright test feature-2",
+    "test:feature-2:uat": "cross-env ENV=uat npx playwright test feature-2",
+    "test:feature-3:local": "cross-env ENV=local npx playwright test feature-3",
+    "test:feature-3:uat": "cross-env ENV=uat npx playwright test feature-3",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "npx playwright test --debug",
+    "test:ui": "npx playwright test --ui",
+    "report": "npx playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.2.2",
+    "cross-env": "^10.1.0",
+    "dotenv": "^17.2.4"
+  }
+}

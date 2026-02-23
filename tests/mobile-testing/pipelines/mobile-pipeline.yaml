@@ -1,0 +1,52 @@
+trigger:
+  branches:
+    include:
+      - main
+      - develop
+  paths:
+    include:
+      - tests/mobile-testing/**
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  - name: workingDirectory
+    value: '$(System.DefaultWorkingDirectory)/tests/mobile-testing'
+
+stages:
+  - stage: Mobile_Testing
+    displayName: 'Mobile Testing'
+    jobs:
+      - job: RunTests
+        displayName: 'Run Mobile Tests'
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: '3.x'
+              addToPath: true
+            displayName: 'Install Python'
+
+          - script: |
+              cd $(workingDirectory)
+              pip install -r requirements.txt
+            displayName: 'Install dependencies'
+
+          - script: |
+              cd $(workingDirectory)
+              pytest tests/ --junitxml=test-results/junit.xml
+            displayName: 'Run Mobile Tests'
+
+          - task: PublishTestResults@2
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: 'JUnit'
+              testResultsFiles: '$(workingDirectory)/test-results/junit.xml'
+              testRunTitle: 'Mobile Test Results'
+
+          - task: PublishPipelineArtifact@1
+            condition: succeededOrFailed()
+            inputs:
+              targetPath: '$(workingDirectory)/test-results'
+              artifact: 'mobile-test-report'
+              publishLocation: 'pipeline'

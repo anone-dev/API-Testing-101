@@ -1,0 +1,17 @@
+{
+  "env": "UAT",
+  "users": {
+    "admin": {
+      "username": "uat_admin",
+      "password": "uat_admin_pass"
+    },
+    "user": {
+      "username": "uat_user",
+      "password": "uat_user_pass"
+    }
+  },
+  "testData": {
+    "validEmail": "test@uat.example.com",
+    "validPhone": "0887654321"
+  }
+}

@@ -1,0 +1,26 @@
+USERS:
+  valid:
+    username: "ios_local@example.com"
+    password: "iOSLocal@1234"
+  admin:
+    username: "ios_local_admin@example.com"
+    password: "iOSLocalAdmin@1234"
+  invalid:
+    username: "invalid@example.com"
+    password: "wrongpassword"
+
+PAYMENT:
+  transfer:
+    amount: "100"
+    recipient: "0811111111"
+    note: "iOS Local test transfer"
+  favorites:
+    name: "iOS Local Test"
+    account: "1111111111"
+
+PROFILE:
+  user:
+    firstName: "iOS Local"
+    lastName: "User"
+    email: "ios_local@example.com"
+    phone: "0811111111"

@@ -1,0 +1,10 @@
+# Core Dependencies (Required)
+robotframework==6.0.1
+robotframework-appiumlibrary==2.0.0
+
+# Test Data & Configuration (Recommended)
+PyYAML==6.0.1                         # YAML test data files
+python-dotenv==1.0.0                  # Environment variable management
+
+# Database Integration (Optional)
+pymysql==1.1.0                        # MySQL database helper

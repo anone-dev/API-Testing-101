@@ -1,0 +1,21 @@
+{
+  "users": {
+    "user": {
+      "username": "local_user",
+      "password": "local_password",
+      "email": "local@example.com",
+      "firstName": "Local",
+      "lastName": "User"
+    },
+    "admin": {
+      "username": "local_admin",
+      "password": "local_admin_password",
+      "email": "admin@localhost",
+      "firstName": "Local",
+      "lastName": "Admin"
+    }
+  },
+  "dashboard": {
+    "welcomeMessage": "Welcome to Local Environment"
+  }
+}

@@ -1,0 +1,26 @@
+USERS:
+  valid:
+    username: "iostest@example.com"
+    password: "iOS@1234"
+  admin:
+    username: "iosadmin@example.com"
+    password: "iOSAdmin@1234"
+  invalid:
+    username: "invalid@example.com"
+    password: "wrongpassword"
+
+PAYMENT:
+  transfer:
+    amount: "1000"
+    recipient: "0812345678"
+    note: "iOS test transfer"
+  favorites:
+    name: "John Doe"
+    account: "1234567890"
+
+PROFILE:
+  user:
+    firstName: "iOS"
+    lastName: "User"
+    email: "iostest@example.com"
+    phone: "0812345678"

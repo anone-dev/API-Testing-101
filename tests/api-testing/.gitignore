@@ -1,0 +1,14 @@
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# Environment - Only ignore local environment files
+.env.local
+
+# Keep SIT and UAT environment files
+# .env (SIT) - tracked
+# .env.uat - tracked
