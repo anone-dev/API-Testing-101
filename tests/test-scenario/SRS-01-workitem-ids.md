@@ -58,6 +58,8 @@ Board: https://dev.azure.com/AXONS-Strategic-And-Digital-Transformation/coe-app-
 | TC-29 | [WEB][Orders][Create] Create order via Web UI | 12598 |
 | TC-30 | [WEB][Stock][Reset] Reset stock button works | 12599 |
 | TC-31 | [WEB][UI][Theme] Web UI supports 6 color themes | 12600 |
+| TC-32 | [WEB][Orders][Stock] Create order reduces book stock in Web UI | 12654 |
+| TC-33 | [WEB][Orders][Stock] Order out-of-stock book shows error in Web UI | 12655 |
 
 ---
-Total: 31 Axons Test Scenario work items | IDs: 12570–12600 (ยกเว้น 12594 ที่ข้ามไป) + 12653 (TC-01 สร้างใหม่)
+Total: 33 Axons Test Scenario work items

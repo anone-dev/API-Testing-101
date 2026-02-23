@@ -1,25 +1,21 @@
 {
-  "env": "SIT",
-  "users": {
-    "validUser": {
-      "username": "sit_admin",
-      "password": "sit_admin_pass"
-    },
-    "invalidUser": {
-      "username": "invalid_user",
-      "password": "wrong_password"
-    },
-    "admin": {
-      "username": "sit_admin",
-      "password": "sit_admin_pass"
-    },
-    "user": {
-      "username": "sit_user",
-      "password": "sit_user_pass"
-    }
+  "env": "sit",
+  "webUI": {
+    "baseUrl": "http://localhost:8000",
+    "password": "qacoe",
+    "wrongPassword": "wrongpassword"
   },
-  "testData": {
-    "validEmail": "test@sit.example.com",
-    "validPhone": "0812345678"
+  "register": {
+    "name": "SIT Test User",
+    "emailPrefix": "sit_test"
+  },
+  "order": {
+    "bookId": 1,
+    "customerName": "SIT Customer"
+  },
+  "outOfStockBookId": 2,
+  "stockReset": {
+    "name": "SIT Stock Tester",
+    "emailPrefix": "sit_stock"
   }
 }

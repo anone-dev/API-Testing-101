@@ -16,6 +16,7 @@ dotenv.config({ path: path.resolve(__dirname, envFile) });
  */
 export default defineConfig({
   testDir: './tests-web',
+  globalSetup: './globalSetup.ts',
   timeout: 30000,
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
@@ -28,7 +29,8 @@ export default defineConfig({
     ['junit', { outputFile: 'test-results/junit.xml' }]
   ],
   use: {
-    baseURL: process.env.BASE_URL || 'https://sit.example.com',
+    baseURL: process.env.BASE_URL || 'http://localhost:8000',
+    storageState: 'test-results/.auth.json',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     video: 'retain-on-failure',

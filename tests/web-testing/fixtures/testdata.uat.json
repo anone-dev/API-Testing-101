@@ -1,17 +1,21 @@
 {
-  "env": "UAT",
-  "users": {
-    "admin": {
-      "username": "uat_admin",
-      "password": "uat_admin_pass"
-    },
-    "user": {
-      "username": "uat_user",
-      "password": "uat_user_pass"
-    }
+  "env": "uat",
+  "webUI": {
+    "baseUrl": "http://localhost:8000",
+    "password": "qacoe",
+    "wrongPassword": "wrongpassword"
   },
-  "testData": {
-    "validEmail": "test@uat.example.com",
-    "validPhone": "0887654321"
+  "register": {
+    "name": "UAT Test User",
+    "emailPrefix": "uat_test"
+  },
+  "order": {
+    "bookId": 1,
+    "customerName": "UAT Customer"
+  },
+  "outOfStockBookId": 2,
+  "stockReset": {
+    "name": "UAT Stock Tester",
+    "emailPrefix": "uat_stock"
   }
 }

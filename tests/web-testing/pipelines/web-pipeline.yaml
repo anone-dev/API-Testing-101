@@ -7,23 +7,44 @@ trigger:
     include:
       - tests/web-testing/**
 
+resources:
+  repositories:
+  - repository: templates
+    type: git
+    name: pipeline-templates
+    ref: refs/heads/main
+
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'qa-automation'
 
 variables:
+  - group: notification-config
   - name: workingDirectory
     value: '$(System.DefaultWorkingDirectory)/tests/web-testing'
+  - name: mockServerDir
+    value: '$(System.DefaultWorkingDirectory)/coe-app-demo'
+  - name: mockServerPort
+    value: '5000'
 
 stages:
   - stage: Web_Testing
-    displayName: 'Web Testing'
+    displayName: 'Web Testing with Mock Server'
     jobs:
       - job: RunTests
-        displayName: 'Run Web Tests'
+        displayName: 'Start Mock Server & Run Web Tests'
         steps:
+
+          - script: |
+              chmod +x $(mockServerDir)/BooksAPI-Linux
+              HEADLESS=1 $(mockServerDir)/BooksAPI-Linux &
+              echo $! > /tmp/mock_server.pid
+              sleep 3
+              curl -s http://localhost:$(mockServerPort)/status | python3 -m json.tool
+            displayName: 'Start Mock Server'
+
           - task: NodeTool@0
             inputs:
-              versionSpec: '18.x'
+              versionSpec: '20.x'
             displayName: 'Install Node.js'
 
           - script: |
@@ -38,10 +59,16 @@ stages:
 
           - script: |
               cd $(workingDirectory)
-              npm run test
-            displayName: 'Run Web Tests'
+              npm run ui:sit:all:cliMode
+            displayName: 'Run Web Tests (sit)'
             env:
-              ENV: 'dev'
+              BASE_URL: 'http://localhost:$(mockServerPort)'
+              ENV: 'sit'
+
+          - script: |
+              kill $(cat /tmp/mock_server.pid) 2>/dev/null || true
+            displayName: 'Stop Mock Server'
+            condition: always()
 
           - task: PublishTestResults@2
             condition: succeededOrFailed()
@@ -56,3 +83,17 @@ stages:
               targetPath: '$(workingDirectory)/playwright-report'
               artifact: 'web-test-report'
               publishLocation: 'pipeline'
+
+          - template: templates/publish-test-results-artifacts.yaml@templates
+            parameters:
+              junitFile: '$(workingDirectory)/test-results/junit.xml'
+              reportPath: '$(workingDirectory)/playwright-report'
+              reportArtifactName: 'web-test-report'
+              statusArtifactName: 'job-status-noti'
+              jobName: 'RunTests'
+
+  - template: templates/sent-notification.yaml@templates
+    parameters:
+      dependsOn: 'Web_Testing'
+      teamWebhookUrl: $(TEAMS_WEBHOOK_URL)
+      artifactName: 'job-status-noti'

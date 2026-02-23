@@ -1,21 +1,21 @@
 {
-  "users": {
-    "user": {
-      "username": "local_user",
-      "password": "local_password",
-      "email": "local@example.com",
-      "firstName": "Local",
-      "lastName": "User"
-    },
-    "admin": {
-      "username": "local_admin",
-      "password": "local_admin_password",
-      "email": "admin@localhost",
-      "firstName": "Local",
-      "lastName": "Admin"
-    }
+  "env": "local",
+  "webUI": {
+    "baseUrl": "http://localhost:8000",
+    "password": "qacoe",
+    "wrongPassword": "wrongpassword"
   },
-  "dashboard": {
-    "welcomeMessage": "Welcome to Local Environment"
+  "register": {
+    "name": "Local Test User",
+    "emailPrefix": "local_test"
+  },
+  "order": {
+    "bookId": 1,
+    "customerName": "Local Customer"
+  },
+  "outOfStockBookId": 2,
+  "stockReset": {
+    "name": "Local Stock Tester",
+    "emailPrefix": "local_stock"
   }
 }
