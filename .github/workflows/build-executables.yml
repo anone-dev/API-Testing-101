@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-20.04]
+        os: [windows-latest, macos-latest, ubuntu-22.04]
         include:
           - os: windows-latest
             output_name: BooksAPI-Windows.exe
@@ -15,7 +15,7 @@ jobs:
           - os: macos-latest
             output_name: BooksAPI-macOS
             artifact_name: BooksAPI-macOS
-          - os: ubuntu-20.04
+          - os: ubuntu-22.04
             output_name: BooksAPI-Linux
             artifact_name: BooksAPI-Linux
     
@@ -34,10 +34,14 @@ jobs:
       run: pip install -r build-requirements.txt
     
     - name: Build Linux
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-22.04'
       working-directory: books-local
       run: |
-        pyinstaller --onefile --add-data "ui.html:." --add-data "api-docs.html:." --add-data "swagger-local.yaml:." --name "BooksAPI-Linux" app_standalone.py
+        docker run --rm -v "$PWD:/src" -w /src ubuntu:20.04 bash -c "
+          apt-get update -q && apt-get install -y -q python3 python3-pip &&
+          pip3 install pyinstaller flask flask-cors &&
+          pyinstaller --onefile --add-data 'ui.html:.' --add-data 'api-docs.html:.' --add-data 'swagger-local.yaml:.' --name 'BooksAPI-Linux' app_standalone.py
+        "
 
     - name: Build Windows
       if: matrix.os == 'windows-latest'
