@@ -10,14 +10,59 @@ cd books_mobile_app
 run-simple.bat
 ```
 
-### Build APK for Android
-```cmd
+### Build for Android
+
+#### APK (สำหรับ Testing)
+```bash
 cd books_mobile_app
+flutter build apk
+```
+APK จะอยู่ที่: `build/app/outputs/flutter-apk/app-release.apk`
+
+#### APK แยกตาม CPU (ขนาดเล็กกว่า)
+```bash
+flutter build apk --split-per-abi
+```
+APK จะอยู่ที่:
+- `build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk`
+- `build/app/outputs/flutter-apk/app-arm64-v8a-release.apk`
+- `build/app/outputs/flutter-apk/app-x86_64-release.apk`
+
+#### App Bundle (สำหรับ Google Play Store)
+```bash
+flutter build appbundle
+```
+AAB จะอยู่ที่: `build/app/outputs/bundle/release/app-release.aab`
+
+#### Windows Batch Script
+```cmd
 build-apk.bat
 ```
-# หรือ .\build-apk.bat
 
-APK จะอยู่ที่: `build\app\outputs\flutter-apk\app-release.apk`
+### Build for iOS (macOS only)
+
+#### .app สำหรับ iOS Simulator (Appium Testing)
+```bash
+cd books_mobile_app
+flutter build ios --simulator --debug
+```
+.app จะอยู่ที่: `build/ios/iphonesimulator/Runner.app`
+
+#### .ipa สำหรับ Physical Device
+```bash
+flutter build ipa --release
+```
+.ipa จะอยู่ที่: `build/ios/ipa/books_mobile_app.ipa`
+
+#### เปิดใน Xcode (สำหรับ Archive/Upload)
+```bash
+open ios/Runner.xcworkspace
+```
+
+**หมายเหตุ iOS:**
+- **Simulator**: ใช้ `.app` (ไม่ต้อง Apple Developer Account)
+- **Physical Device**: ใช้ `.ipa` (ต้อง Apple Developer Account + code signing)
+- **Manual Testing**: ไม่ต้อง build แค่ `flutter run`
 
 ### Manual
 
@@ -54,17 +99,21 @@ flutter run -d <device-id>
 ## 🔧 Configuration
 
 ### API URL
+
+แอปจะ **auto-detect port อัตโนมัติ** โดยลองเชื่อมต่อ:
+1. Port 5001 ก่อน (macOS default)
+2. Port 5000 (Windows/Linux default)
+
+**ไม่ต้องแก้ไขโค้ด** - แอปจะหา port ที่ใช้งานได้เองอัตโนมัติ
+
+**สำหรับ Physical Device** (ต้องใช้ IP ของเครื่อง):
+
 แก้ไข `lib/services/api_service.dart`:
-
 ```dart
-// Android Emulator (default)
-static const String baseUrl = 'http://10.0.2.2:5000';
-
-// iOS Simulator
-static const String baseUrl = 'http://localhost:5000';
-
-// Physical Device (ใช้ IP ของเครื่อง)
-static const String baseUrl = 'http://192.168.1.xxx:5000';
+// เปลี่ยนจาก auto-detect เป็น IP จริง
+static Future<String> get baseUrl async {
+  return 'http://192.168.1.xxx:5001'; // ใช้ IP ของเครื่อง
+}
 ```
 
 ### หา IP Address ของเครื่อง
@@ -143,6 +192,8 @@ adb -s <device-id> install build\app\outputs\flutter-apk\app-release.apk
 
 ### Appium Configuration
 **Desired Capabilities สำหรับ Robot Framework:**
+
+**Android:**
 ```robot
 *** Settings ***
 Library    AppiumLibrary
@@ -153,15 +204,60 @@ ${DEVICE_NAME}          emulator-5554
 ${APP_PACKAGE}          com.example.books_mobile_app
 ${APP_ACTIVITY}         .MainActivity
 ${AUTOMATION_NAME}      UiAutomator2
+${APK_PATH}             ${CURDIR}/../build/app/outputs/flutter-apk/app-release.apk
 
 *** Test Cases ***
-Open Books App
+Open Books App Android
     Open Application    http://localhost:4723/wd/hub
     ...    platformName=${PLATFORM_NAME}
     ...    deviceName=${DEVICE_NAME}
     ...    appPackage=${APP_PACKAGE}
     ...    appActivity=${APP_ACTIVITY}
     ...    automationName=${AUTOMATION_NAME}
+    ...    app=${APK_PATH}
+```
+
+**iOS Simulator:**
+```robot
+*** Settings ***
+Library    AppiumLibrary
+
+*** Variables ***
+${PLATFORM_NAME}        iOS
+${PLATFORM_VERSION}     17.0
+${DEVICE_NAME}          iPhone 15
+${AUTOMATION_NAME}      XCUITest
+${APP_PATH}             ${CURDIR}/../build/ios/iphonesimulator/Runner.app
+
+*** Test Cases ***
+Open Books App iOS
+    Open Application    http://localhost:4723/wd/hub
+    ...    platformName=${PLATFORM_NAME}
+    ...    platformVersion=${PLATFORM_VERSION}
+    ...    deviceName=${DEVICE_NAME}
+    ...    automationName=${AUTOMATION_NAME}
+    ...    app=${APP_PATH}
+```
+
+**iOS Physical Device:**
+```robot
+*** Variables ***
+${PLATFORM_NAME}        iOS
+${PLATFORM_VERSION}     17.0
+${DEVICE_NAME}          iPhone
+${UDID}                 <your-device-udid>
+${AUTOMATION_NAME}      XCUITest
+${APP_PATH}             ${CURDIR}/../build/ios/ipa/books_mobile_app.ipa
+
+*** Test Cases ***
+Open Books App iOS Device
+    Open Application    http://localhost:4723/wd/hub
+    ...    platformName=${PLATFORM_NAME}
+    ...    platformVersion=${PLATFORM_VERSION}
+    ...    deviceName=${DEVICE_NAME}
+    ...    udid=${UDID}
+    ...    automationName=${AUTOMATION_NAME}
+    ...    app=${APP_PATH}
 ```
 
 ### Automation Testing Keys

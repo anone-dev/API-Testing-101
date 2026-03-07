@@ -182,16 +182,20 @@ def reset_stock():
 def clear_auth():
     return jsonify({"message": "Auth cleared"}), 200
 
-def open_browser():
-    webbrowser.open('http://localhost:5000/ui.html')
+
 
 if __name__ == '__main__':
+    import platform
+    
     print("\n" + "="*60)
     print("  📚 Simple Books API - Standalone Server")
-    print("  👨💻 Developed by: Anan.Ph : QA-CoE | 2026-02-17")
+    print("  👨💻 Developed by: Anan.Ph : QA-CoE | 2026-03-07")
     print("="*60)
 
     headless = '--headless' in sys.argv or os.environ.get('HEADLESS') == '1'
+    
+    # Use port 5001 on macOS to avoid AirPlay conflict, 5000 on others
+    port = 5001 if platform.system() == 'Darwin' else 5000
 
     if not headless:
         PASSWORD = "qacoe"
@@ -202,11 +206,13 @@ if __name__ == '__main__':
             print("  ❌ Incorrect password. Try again.")
 
     print("\n" + "="*60)
-    print("  🌐 Server: http://localhost:5000")
-    print("  🎨 Web UI: http://localhost:5000/ui.html")
-    print("  📖 API Docs: http://localhost:5000/api-docs.html")
+    print(f"  🌐 Server: http://localhost:{port}")
+    print(f"  🎨 Web UI: http://localhost:{port}/ui.html")
+    print(f"  📖 API Docs: http://localhost:{port}/api-docs.html")
+    if platform.system() == 'Darwin':
+        print("  🍎 macOS detected - Using port 5001 to avoid AirPlay")
     print("="*60 + "\n")
 
     if not headless:
-        threading.Timer(1.5, open_browser).start()
-    app.run(host='0.0.0.0', port=5000, debug=False)
+        threading.Timer(1.5, lambda: webbrowser.open(f'http://localhost:{port}/ui.html')).start()
+    app.run(host='0.0.0.0', port=port, debug=False)

@@ -19,8 +19,30 @@ chmod +x start.sh
 ./start.sh
 ```
 
+### macOS - แก้ปัญหา Port 5000 ชนกับ AirPlay
+
+**วิธีที่ 1: ใช้ start-mac.sh (แนะนำ)**
+```bash
+chmod +x start.sh start-mac.sh
+./start-mac.sh
+# จะใช้ port 5001 แทน 5000 อัตโนมัติ
+```
+
+**วิธีที่ 2: ปิด AirPlay Receiver**
+```bash
+# System Settings → General → AirDrop & Handoff → AirPlay Receiver → Off
+./start.sh
+```
+
+**วิธีที่ 3: กำหนด Port เอง**
+```bash
+export API_PORT=5001
+export UI_PORT=8000
+./start.sh
+```
+
 ### URLs
-- **API Server**: http://localhost:5000
+- **API Server**: http://localhost:5000 (หรือ port ที่กำหนด)
 - **Web UI**: http://localhost:8000/ui.html
 - **API Docs (Swagger)**: http://localhost:8000/api-docs.html
 

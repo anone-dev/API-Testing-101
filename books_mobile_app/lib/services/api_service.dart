@@ -1,17 +1,57 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import '../models/book.dart';
 import '../models/order.dart';
 
 class ApiService {
-  // Android Emulator - ใช้ 10.0.2.2 (localhost ของ host machine)
-  // ถ้าไม่ได้ให้ใช้ IP จริงของเครื่อง เช่น 192.168.1.100
-  static const String baseUrl = 'http://10.0.2.2:5000'; // Android Emulator
-  // static const String baseUrl = 'http://192.168.1.100:5000'; // ใช้ IP จริง
-  // static const String baseUrl = 'http://localhost:5000'; // iOS Simulator
+  // Auto-detect port: try 5001 first (macOS), fallback to 5000
+  static String _baseUrl = '';
+  
+  static Future<String> get baseUrl async {
+    if (_baseUrl.isNotEmpty) return _baseUrl;
+    
+    // Determine base host based on platform
+    String host;
+    if (Platform.isAndroid) {
+      host = '10.0.2.2'; // Android Emulator
+    } else if (Platform.isIOS) {
+      host = 'localhost'; // iOS Simulator
+    } else {
+      host = 'localhost'; // Desktop/Web
+    }
+    
+    // Try port 5001 first (macOS default), then 5000
+    for (int port in [5001, 5000]) {
+      try {
+        final response = await http.get(
+          Uri.parse('http://$host:$port/status'),
+        ).timeout(Duration(seconds: 2));
+        
+        if (response.statusCode == 200) {
+          _baseUrl = 'http://$host:$port';
+          print('✅ Connected to API at $_baseUrl');
+          return _baseUrl;
+        }
+      } catch (e) {
+        // Try next port
+      }
+    }
+    
+    // Default fallback
+    _baseUrl = 'http://$host:5000';
+    print('⚠️ Using default: $_baseUrl');
+    return _baseUrl;
+  }
+  
+  // Reset base URL (useful for testing)
+  static void resetBaseUrl() {
+    _baseUrl = '';
+  }
 
   Future<List<Book>> getBooks({String? type, int? limit}) async {
-    var uri = Uri.parse('$baseUrl/books');
+    final url = await baseUrl;
+    var uri = Uri.parse('$url/books');
     if (type != null || limit != null) {
       uri = uri.replace(queryParameters: {
         if (type != null) 'type': type,
@@ -28,7 +68,8 @@ class ApiService {
   }
 
   Future<Book> getBookById(int id) async {
-    final response = await http.get(Uri.parse('$baseUrl/books/$id'));
+    final url = await baseUrl;
+    final response = await http.get(Uri.parse('$url/books/$id'));
     if (response.statusCode == 200) {
       return Book.fromJson(json.decode(response.body));
     }
@@ -36,8 +77,9 @@ class ApiService {
   }
 
   Future<String> register(String email, String name) async {
+    final url = await baseUrl;
     final response = await http.post(
-      Uri.parse('$baseUrl/api-clients'),
+      Uri.parse('$url/api-clients'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'clientEmail': email, 'clientName': name}),
     );
@@ -50,8 +92,9 @@ class ApiService {
 
   Future<bool> validateToken(String token) async {
     try {
+      final url = await baseUrl;
       final response = await http.get(
-        Uri.parse('$baseUrl/orders'),
+        Uri.parse('$url/orders'),
         headers: {'Authorization': 'Bearer $token'},
       );
       return response.statusCode == 200;
@@ -61,8 +104,9 @@ class ApiService {
   }
 
   Future<String> createOrder(String token, int bookId, String customerName) async {
+    final url = await baseUrl;
     final response = await http.post(
-      Uri.parse('$baseUrl/orders'),
+      Uri.parse('$url/orders'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -76,8 +120,9 @@ class ApiService {
   }
 
   Future<List<Order>> getOrders(String token) async {
+    final url = await baseUrl;
     final response = await http.get(
-      Uri.parse('$baseUrl/orders'),
+      Uri.parse('$url/orders'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode == 200) {
@@ -88,8 +133,9 @@ class ApiService {
   }
 
   Future<void> deleteOrder(String token, String orderId) async {
+    final url = await baseUrl;
     final response = await http.delete(
-      Uri.parse('$baseUrl/orders/$orderId'),
+      Uri.parse('$url/orders/$orderId'),
       headers: {'Authorization': 'Bearer $token'},
     );
     if (response.statusCode != 204) {
@@ -98,8 +144,9 @@ class ApiService {
   }
 
   Future<void> updateOrder(String token, String orderId, String customerName) async {
+    final url = await baseUrl;
     final response = await http.patch(
-      Uri.parse('$baseUrl/orders/$orderId'),
+      Uri.parse('$url/orders/$orderId'),
       headers: {
         'Authorization': 'Bearer $token',
         'Content-Type': 'application/json',

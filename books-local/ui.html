@@ -306,7 +306,7 @@
         <div class="password-box">
             <h1>📚 Simple Books API</h1>
             <p class="subtitle">Local Mock Server - Modern Web UI</p>
-            <p class="developer">Developed by: Anan.Ph : QA-CoE | 2026-02-17</p>
+            <p class="developer">Developed by: Anan.Ph : QA-CoE | 2026-03-07</p>
             <h2>🔐 Enter Password</h2>
             <input type="password" id="passwordInput" data-testid="password-input" placeholder="Enter password" style="width: 100%;">
             <div id="passwordError" class="password-error hidden" data-testid="password-error"></div>
@@ -317,7 +317,7 @@
     <header>
         <h1>📚 Simple Books API</h1>
         <p style="font-size: 1.1em; color: #718096;">Local Mock Server - Modern Web UI</p>
-        <p style="font-size: 0.9em; color: #a0aec0; margin-top: 10px;">Developed by: Anan.Ph : QA-CoE | 2026-02-17</p>
+        <p style="font-size: 0.9em; color: #a0aec0; margin-top: 10px;">Developed by: Anan.Ph : QA-CoE | 2026-03-07</p>
     </header>
 
     <div class="container">
@@ -464,7 +464,35 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:5000';
+        // Auto-detect API port (try 5001 first for macOS, then 5000)
+        let API_URL = '';
+        
+        async function detectApiPort() {
+            const ports = [5001, 5000]; // Try macOS port first
+            
+            for (const port of ports) {
+                try {
+                    const response = await fetch(`http://localhost:${port}/status`, {
+                        method: 'GET',
+                        signal: AbortSignal.timeout(2000)
+                    });
+                    
+                    if (response.ok) {
+                        API_URL = `http://localhost:${port}`;
+                        console.log(`✅ Connected to API at ${API_URL}`);
+                        return true;
+                    }
+                } catch (err) {
+                    // Try next port
+                }
+            }
+            
+            // Default fallback
+            API_URL = 'http://localhost:5000';
+            console.warn('⚠️ Using default: ' + API_URL);
+            return false;
+        }
+        
         let token = localStorage.getItem('apiToken') || '';
         let isAuthenticated = localStorage.getItem('authenticated') === 'true';
 
@@ -472,28 +500,38 @@
         if (isAuthenticated) {
             document.getElementById('passwordModal').style.display = 'none';
             
-            // Check if server restarted
-            const serverStartTime = localStorage.getItem('serverStartTime');
-            if (serverStartTime) {
-                fetch(`${API_URL}/status`)
-                    .then(res => res.json())
-                    .then(data => {
-                        const currentStartTime = data.startTime;
-                        if (currentStartTime !== serverStartTime) {
-                            // Server restarted, clear auth and reload
+            // Detect API port and check if server restarted
+            detectApiPort().then(connected => {
+                if (!connected) {
+                    document.getElementById('passwordModal').style.display = 'flex';
+                    localStorage.removeItem('authenticated');
+                    return;
+                }
+                
+                const serverStartTime = localStorage.getItem('serverStartTime');
+                if (serverStartTime) {
+                    fetch(`${API_URL}/status`)
+                        .then(res => res.json())
+                        .then(data => {
+                            const currentStartTime = data.startTime;
+                            if (currentStartTime !== serverStartTime) {
+                                // Server restarted, clear auth and reload
+                                localStorage.removeItem('authenticated');
+                                localStorage.setItem('serverStartTime', currentStartTime);
+                                location.reload();
+                            }
+                        })
+                        .catch(() => {
+                            // Server offline, clear auth
                             localStorage.removeItem('authenticated');
-                            localStorage.setItem('serverStartTime', currentStartTime);
-                            location.reload();
-                        }
-                    })
-                    .catch(() => {
-                        // Server offline, clear auth
-                        localStorage.removeItem('authenticated');
-                        localStorage.removeItem('serverStartTime');
-                    });
-            }
+                            localStorage.removeItem('serverStartTime');
+                        });
+                }
+            });
         } else {
             document.getElementById('passwordModal').style.display = 'flex';
+            // Detect port even when not authenticated
+            detectApiPort();
         }
 
         // Handle Enter key in password input
@@ -506,21 +544,32 @@
             const errorDiv = document.getElementById('passwordError');
             
             if (password === 'qacoe') {
-                // Get server start time before setting authenticated
-                fetch(`${API_URL}/status`)
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.startTime) {
-                            localStorage.setItem('serverStartTime', data.startTime);
-                        }
-                        localStorage.setItem('authenticated', 'true');
-                        document.getElementById('passwordModal').style.display = 'none';
-                        isAuthenticated = true;
-                    })
-                    .catch(() => {
+                // Ensure API_URL is detected before checking server
+                detectApiPort().then(connected => {
+                    if (!connected) {
                         errorDiv.textContent = '❌ Cannot connect to server!';
                         errorDiv.classList.remove('hidden');
-                    });
+                        return;
+                    }
+                    
+                    // Get server start time before setting authenticated
+                    fetch(`${API_URL}/status`)
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.startTime) {
+                                localStorage.setItem('serverStartTime', data.startTime);
+                            }
+                            localStorage.setItem('authenticated', 'true');
+                            document.getElementById('passwordModal').style.display = 'none';
+                            isAuthenticated = true;
+                            // Load books after successful login
+                            loadBooks();
+                        })
+                        .catch(() => {
+                            errorDiv.textContent = '❌ Cannot connect to server!';
+                            errorDiv.classList.remove('hidden');
+                        });
+                });
             } else {
                 errorDiv.textContent = '❌ Incorrect password!';
                 errorDiv.classList.remove('hidden');
@@ -911,7 +960,11 @@
         }
 
         // Load books on page load
-        loadBooks();
+        detectApiPort().then(() => {
+            if (isAuthenticated) {
+                loadBooks();
+            }
+        });
     </script>
 </body>
 </html>
