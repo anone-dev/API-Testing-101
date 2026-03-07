@@ -43,7 +43,7 @@ web-testing/
 │   ├── LoginPage.ts                # Login page object
 │   └── DashboardPage.ts            # Dashboard page object
 ├── 📂 fixtures/                    # Test data per environment
-│   ├── testdata.sit.json           # SIT test data (default)
+│   ├── testdata.sit.json           # SIT test data
 │   ├── testdata.local.json         # Local test data
 │   └── testdata.uat.json           # UAT test data
 ├── 📂 helpers/                     # Test utilities
@@ -60,7 +60,7 @@ web-testing/
 │   └── index.html                  # Latest test report
 ├── 📂 test-results/                # Test artifacts & screenshots
 │   └── .last-run.json              # Last test run metadata
-├── 📄 .env                         # SIT environment (default)
+├── 📄 .env.sit                     # SIT environment
 ├── 📄 .env.local                   # Local environment
 ├── 📄 .env.uat                     # UAT environment
 ├── 📄 playwright.config.ts         # Playwright configuration

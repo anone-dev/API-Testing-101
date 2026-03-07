@@ -46,7 +46,7 @@ api-testing/
 ├── 📂 schemas/                     # JSON schema definitions
 │   └── api.schema.ts               # API response schemas
 ├── 📂 fixtures/                    # Test data per environment
-│   ├── test-data.ts                # SIT test data (default)
+│   ├── test-data.sit.ts            # SIT test data
 │   ├── test-data.local.ts          # Local test data
 │   └── test-data.uat.ts            # UAT test data
 ├── 📂 postman/                     # Postman collection integration
@@ -64,7 +64,7 @@ api-testing/
 │   └── index.html                  # Latest test report
 ├── 📂 test-results/                # Test artifacts & logs
 │   └── .last-run.json              # Last test run metadata
-├── 📄 .env                         # SIT environment (default)
+├── 📄 .env.sit                     # SIT environment
 ├── 📄 .env.local                   # Local environment
 ├── 📄 .env.uat                     # UAT environment
 ├── 📄 playwright.config.ts         # Playwright configuration
@@ -164,7 +164,7 @@ expect(responseBody).toBeDefined();
 import { test, expect } from '@playwright/test';
 import { apiHelper } from '../helpers/api.helper';
 import { validateSchema } from '../helpers/schema.validator';
-import userData from '../fixtures/test-data';
+import userData from '../fixtures/test-data.sit';
 ```
 
 ---

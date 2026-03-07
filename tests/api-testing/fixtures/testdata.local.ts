@@ -1,5 +1,4 @@
 export const booksApiData = {
-  baseUrl: 'http://localhost:5000',
   bookId: {
     fiction: 1,
     nonFiction: 7,

@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 
 const env = process.env.ENV || 'sit';
-const envFile = env.toLowerCase() === 'sit' ? '.env' : `.env.${env.toLowerCase()}`;
+const envFile = `.env.${env.toLowerCase()}`;
 dotenv.config({ path: path.resolve(__dirname, envFile) });
 
 /**

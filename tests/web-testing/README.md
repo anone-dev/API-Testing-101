@@ -1,64 +1,120 @@
 # Web UI E2E Testing with Playwright
 
 ## Overview
-End-to-end testing สำหรับ Simple Books API Web UI (`http://localhost:8000/ui.html`) ใช้ Playwright + Page Object Model รองรับ multi-environment และมี global auth setup
+End-to-end testing framework using Playwright for Simple Books API Web UI with Page Object Model, multi-environment support, and global auth setup.
+
+## Environment Configuration
+
+| Environment | Config File | Description |
+|-------------|-------------|-------------|
+| `local` | `.env.local` | Local development (`http://localhost:8000`) |
+| `sit` | `.env.sit` | System Integration Testing (default) |
+| `uat` | `.env.uat` | User Acceptance Testing |
+
+### Environment Variables
+- `BASE_URL`: Base URL for Web UI
+- `ENV`: Environment name (`local` / `sit` / `uat`)
 
 ## Prerequisites
 
-1. Start Mock Server ก่อน:
-```cmd
+**Start Mock Server first:**
+```bash
 cd books-local
-start.bat
+start.bat          # Windows
+./start.sh         # macOS/Linux
 ```
 
-2. Install dependencies:
-```cmd
+## Installation
+
+```bash
 cd tests/web-testing
 npm install
 npx playwright install
-mkdir test-results
 ```
 
 ## Running Tests
 
-```cmd
-cd tests/web-testing
+**Script format:** `ui:[env]:[suite]:[mode]`
 
-# FR-06 Web UI (CLI)
-npm run ui:sit:FR06:cliMode
-
-# FR-06 Web UI (GUI / interactive)
-npm run ui:sit:FR06:guiMode
-
-# ทั้งหมด
+```bash
+# Run all tests
+npm run ui:local:all:cliMode
+npm run ui:local:all:guiMode
 npm run ui:sit:all:cliMode
+npm run ui:uat:all:cliMode
 
-# ดู HTML report
+# Run FR06 Web UI suite (replace [env] with local / sit / uat)
+npm run ui:local:FR06:cliMode       # TC-12595–12600 (CLI mode)
+npm run ui:local:FR06:guiMode       # TC-12595–12600 (GUI mode)
+npm run ui:sit:FR06:cliMode
+npm run ui:uat:FR06:cliMode
+
+# View HTML report
 npm run report
+```
+
+### Run Specific Test by TC ID
+
+```bash
+npx playwright test -g "[TC-12595]"
+```
+
+### Run Specific Browser
+
+```bash
+npx playwright test --project=chromium
+npx playwright test --project=firefox
+npx playwright test --project=webkit
+```
+
+### Run in Headed Mode
+
+```bash
+npx playwright test --headed
 ```
 
 ## Project Structure
 
 ```
 tests/web-testing/
-├── globalSetup.ts            # Login ครั้งเดียว → บันทึก auth state
+├── .env.sit                  # SIT environment config (default)
+├── .env.local                # Local environment config
+├── .env.uat                  # UAT environment config
+├── globalSetup.ts            # Global auth setup (login once)
 ├── playwright.config.ts      # Playwright configuration
-├── package.json
-├── .env                      # SIT (default): BASE_URL=http://localhost:5000
+├── package.json              # Dependencies & scripts
+│
+├── helpers/
+│   ├── testDataLoader.ts     # Test data loader
+│   └── databaseHelper.ts     # Database operations
+│
+├── fixtures/
+│   ├── testdata.sit.json     # SIT test data
+│   ├── testdata.local.json   # Local test data
+│   └── testdata.uat.json     # UAT test data
 │
 ├── pages/                    # Page Object Model
-│   ├── BasePage.ts           # goto(), waitForPageLoad()
-│   └── BooksAppPage.ts       # locators + actions สำหรับ ui.html
+│   ├── BasePage.ts           # Base page with common methods
+│   └── BooksAppPage.ts       # Books app page object
+│
+├── pipelines/
+│   └── web-pipeline.yaml     # Azure DevOps pipeline
 │
 └── tests-web/
     └── FR06-webUI/
-        ├── webAuth.spec.ts       # TC-12595, TC-12596 (login flow)
-        ├── webBooks.spec.ts      # TC-12597 (books list + filter)
-        ├── webOrders.spec.ts     # TC-12598 (create order)
-        └── webStockTheme.spec.ts # TC-12599, TC-12600 (reset stock, themes)
+        ├── webAuth.spec.ts       # TC-12595, TC-12596
+        ├── webBooks.spec.ts      # TC-12597
+        ├── webOrders.spec.ts     # TC-12598
+        └── webStockTheme.spec.ts # TC-12599, TC-12600
 ```
 
-## Test Cases
+## Test Coverage
+
+| Suite | PBI | TC IDs | Tests | Description |
+|-------|-----|--------|-------|-------------|
+| FR06-webUI | PBI-12561 | 12595–12600 | 6 | Web UI authentication, books, orders, stock, themes |
+
+### Test Cases Detail
 
 | File | TC ID | Description |
 |------|-------|-------------|
@@ -71,8 +127,8 @@ tests/web-testing/
 
 ## Auth Strategy
 
-- `globalSetup.ts` — login ด้วย password `qacoe` ครั้งเดียว บันทึก `localStorage` ลง `test-results/.auth.json`
-- ทุก test โหลด auth state อัตโนมัติ ยกเว้น `webAuth.spec.ts` ที่ต้อง clear ก่อนเพื่อทดสอบ login flow
+- **Global Setup**: `globalSetup.ts` performs login with password `qacoe` once and saves `localStorage` to `test-results/.auth.json`
+- **Auto Auth**: All tests automatically load auth state except `webAuth.spec.ts` which clears it to test login flow
 
 ## Page Objects
 
@@ -88,9 +144,15 @@ await app.filterBooks('fiction', '5');
 await app.createOrder('1', 'Customer Name');
 ```
 
+## Dependencies
+
+- `@playwright/test` - Testing framework
+- `dotenv` - Environment variable management
+- `cross-env` - Cross-platform environment variables
+
 ## Reports
 
-- HTML: `playwright-report/index.html`
-- JSON: `test-results/results.json`
-- JUnit: `test-results/junit.xml`
-- Screenshots: `test-results/web-*.png`
+- **HTML Report**: `playwright-report/index.html`
+- **JSON Report**: `test-results/results.json`
+- **JUnit Report**: `test-results/junit.xml`
+- **Screenshots**: `test-results/web-*.png`

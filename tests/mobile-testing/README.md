@@ -128,11 +128,14 @@ USERS:
 appium
 ```
 
-### Run Tests
+### Basic Test Execution
+
+**Command format:** `robot --variable ENV:<env> --variable PLATFORM:<platform> [options] <suite>`
+
 ทุก `.robot` มี default variables (`ENV=local`, `PLATFORM=android`) ไว้แล้ว สามารถ override ได้ผ่าน `--variable`:
 
 ```bash
-# Android Local (ใช้ default — ไม่ต้องใส่ --variable)
+# Android Local (default - no variables needed)
 robot tests-mobile/
 
 # Android SIT
@@ -145,14 +148,16 @@ robot --variable PLATFORM:ios tests-mobile/
 robot --variable ENV:sit --variable PLATFORM:ios tests-mobile/
 ```
 
-### Specific Suite
+### Run Specific Suite
 ```bash
 robot --variable ENV:local --variable PLATFORM:android tests-mobile/auth/auth.robot
-robot --variable ENV:sit   --variable PLATFORM:android tests-mobile/books/books.robot
-robot --variable ENV:sit   --variable PLATFORM:ios     tests-mobile/orders/orders.robot
+robot --variable ENV:local --variable PLATFORM:android tests-mobile/books/books.robot
+robot --variable ENV:local --variable PLATFORM:android tests-mobile/orders/orders.robot
+robot --variable ENV:sit   --variable PLATFORM:android tests-mobile/
+robot --variable ENV:sit   --variable PLATFORM:ios     tests-mobile/
 ```
 
-### With Tags
+### Run with Tags
 ```bash
 robot --variable ENV:local --variable PLATFORM:android --include smoke           tests-mobile/
 robot --variable ENV:local --variable PLATFORM:android --include regression      tests-mobile/
@@ -160,7 +165,7 @@ robot --variable ENV:sit   --variable PLATFORM:android --include Feature:Auth   
 robot --variable ENV:sit   --variable PLATFORM:android --include Important:Critical tests-mobile/
 ```
 
-### With Output Directory
+### Run with Output Directory
 ```bash
 robot --variable ENV:local --variable PLATFORM:android --outputdir results/android-local tests-mobile/
 robot --variable ENV:sit   --variable PLATFORM:ios     --outputdir results/ios-sit       tests-mobile/
@@ -169,7 +174,15 @@ robot --variable ENV:sit   --variable PLATFORM:ios     --outputdir results/ios-s
 ### Parallel Execution
 ```bash
 pip install robotframework-pabot
+
 pabot --processes 2 --variable ENV:local --variable PLATFORM:android tests-mobile/
+pabot --processes 2 --variable ENV:sit   --variable PLATFORM:ios     tests-mobile/
+```
+
+### Debug Mode
+```bash
+robot --variable ENV:local --variable PLATFORM:android --loglevel DEBUG tests-mobile/auth/auth.robot
+appium --log-level debug
 ```
 
 ## Page Object Model
@@ -208,12 +221,74 @@ User Should Register Successfully
 | `Scenario:Success` | `--include Scenario:Success` |
 | `Scenario:Alternative` | `--include Scenario:Alternative` |
 
+## Device Management
+
+### Android
+```bash
+adb devices
+adb kill-server && adb start-server
+```
+
+### iOS
+```bash
+xcrun simctl list devices
+xcrun simctl boot "iPhone 14"
+xcrun simctl shutdown "iPhone 14"
+```
+
+## App Management
+
+### Download from Azure DevOps
+```bash
+az pipelines runs artifact download --artifact-name android-sit --path apps/
+```
+
+### Download from AWS S3
+```bash
+aws s3 cp s3://builds/android/sit/app-latest.apk apps/app-release.apk
+```
+
+## Database Setup
+
+```bash
+mysql -u root -p testdb < db-scripts/setup.sit.sql
+mysql -u root -p testdb < db-scripts/cleanup.sql
+```
+
+## Reports
+
+### View Reports
+```bash
+# Windows
+start results\android-local\report.html
+
+# macOS/Linux
+open results/android-local/report.html
+```
+
+### Report Files
+- **HTML Report**: `results/report.html`
+- **Log File**: `results/log.html`
+- **Output XML**: `results/output.xml`
+
 ## Troubleshooting
+
+### Verify Appium Installation
+```bash
+appium-doctor --android
+appium-doctor --ios
+```
 
 ### Check Devices
 ```bash
 adb devices                    # Android
 xcrun simctl list devices      # iOS
+```
+
+### Debug Mode
+```bash
+robot --variable ENV:local --variable PLATFORM:android --loglevel DEBUG tests-mobile/auth/auth.robot
+appium --log-level debug
 ```
 
 ### Common Issues
@@ -224,12 +299,7 @@ xcrun simctl list devices      # iOS
 | Device not connected | Verify device/emulator is running |
 | Element not found | Check locator strategy and wait times |
 | Appium not starting | Check port 4723 is available |
-
-```bash
-appium --log-level debug
-appium-doctor --android
-appium-doctor --ios
-```
+| Connection refused | Ensure Appium server is running |
 
 ## Additional Resources
 

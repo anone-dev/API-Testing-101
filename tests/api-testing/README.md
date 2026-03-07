@@ -8,7 +8,7 @@ API testing framework using Playwright for Simple Books API with multi-environme
 | Environment | Config File | Description |
 |-------------|-------------|-------------|
 | `local` | `.env.local` | Local mock server (`http://localhost:5000`) |
-| `sit` | `.env` | System Integration Testing (default) |
+| `sit` | `.env.sit` | System Integration Testing (default) |
 | `uat` | `.env.uat` | User Acceptance Testing |
 
 ### Environment Variables
@@ -58,7 +58,7 @@ npx playwright test -g "[TC-12569]"
 
 ```
 tests/api-testing/
-├── .env                      # SIT environment config (default)
+├── .env.sit                  # SIT environment config (default)
 ├── .env.local                # Local environment config
 ├── .env.uat                  # UAT environment config
 ├── playwright.config.ts      # Playwright configuration
@@ -68,6 +68,11 @@ tests/api-testing/
 │   ├── api.helper.ts         # API request wrapper
 │   ├── env.helper.ts         # Environment loader
 │   └── schema.validator.ts   # AJV JSON schema validator
+│
+├── fixtures/
+│   ├── testdata.sit.ts       # SIT test data
+│   ├── testdata.local.ts     # Local test data
+│   └── testdata.uat.ts       # UAT test data
 │
 ├── schemas/
 │   └── api.schema.ts         # API response schemas

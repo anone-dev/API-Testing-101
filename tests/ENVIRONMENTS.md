@@ -10,12 +10,12 @@
 ## 🔌 API Testing
 
 ### Environment Files
-- `.env` - SIT (default)
+- `.env.sit` - SIT (default)
 - `.env.local` - Local development
 - `.env.uat` - UAT
 
 ### Test Data Files
-- `fixtures/test-data.ts` - SIT
+- `fixtures/test-data.sit.ts` - SIT
 - `fixtures/test-data.local.ts` - Local
 - `fixtures/test-data.uat.ts` - UAT
 
@@ -45,7 +45,7 @@ npm run test:regression:uat
 ## 🌐 Web Testing
 
 ### Environment Files
-- `.env` - SIT (default)
+- `.env.sit` - SIT (default)
 - `.env.local` - Local development
 - `.env.uat` - UAT
 

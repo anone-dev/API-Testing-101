@@ -10,7 +10,7 @@ node_modules/
 # Environment Files - Only ignore local
 .env.local
 
-# Keep tracked: .env (SIT default), .env.uat
+# Keep tracked: .env.sit (SIT default), .env.uat
 
 # TypeScript Build
 *.js.map
