@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 6.0.2 (Python 3.10.8 on win32)" generated="20260306 19:44:56.090" rpa="false" schemaversion="3">
+<suite id="s1" name="Auth" source="d:\myPOC\API-Testing-101\tests\mobile-testing\tests-mobile\auth\auth.robot">
+<kw name="Setup Mobile Test" type="SETUP">
+<kw name="Open Application" library="AppiumLibrary">
+<arg>${APPIUM_URL}</arg>
+<arg>platformName=${PLATFORM_NAME}</arg>
+<arg>platformVersion=${PLATFORM_VERSION}</arg>
+<arg>deviceName=${DEVICE_NAME}</arg>
+<arg>app=${APP_PATH}</arg>
+<arg>automationName=${AUTOMATION_NAME}</arg>
+<arg>noReset=false</arg>
+<doc>Opens a new application to given Appium server.
+Capabilities of appium server, Android and iOS,
+Please check https://appium.io/docs/en/2.1/cli/args/
+| *Option*            | *Man.* | *Description*     |
+| remote_url          | Yes    | Appium server url |
+| alias               | no     | alias             |
+| strict_ssl          | No     | allows you to send commands to an invalid certificate host like a self-signed one. |</doc>
+<kw name="Capture Page Screenshot" library="AppiumLibrary">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<status status="FAIL" starttime="20260306 19:45:01.596" endtime="20260306 19:45:01.597"/>
+</kw>
+<msg timestamp="20260306 19:45:01.600" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: Execution terminated by signal</msg>
+<status status="FAIL" starttime="20260306 19:44:58.730" endtime="20260306 19:45:01.609"/>
+</kw>
+<status status="FAIL" starttime="20260306 19:44:58.728" endtime="20260306 19:45:01.609"/>
+</kw>
+<test id="s1-t1" name="[TC-0001] User Should Register Successfully With Valid Email And Name" line="19">
+<doc>Register with valid email and name → navigate to HomeScreen</doc>
+<tag>Feature:Auth</tag>
+<tag>Important:Critical</tag>
+<tag>robot:exit</tag>
+<tag>Scenario:Success</tag>
+<status status="FAIL" starttime="20260306 19:45:01.610" endtime="20260306 19:45:01.611">Test execution stopped due to a fatal error.</status>
+</test>
+<kw name="Teardown Mobile Test" type="TEARDOWN">
+<kw name="Close Application" library="AppiumLibrary">
+<doc>Closes the current application and also close webdriver session.</doc>
+<kw name="Capture Page Screenshot" library="AppiumLibrary">
+<doc>Takes a screenshot of the current page and embeds it into the log.</doc>
+<msg timestamp="20260306 19:45:01.613" level="FAIL">No application is open</msg>
+<status status="FAIL" starttime="20260306 19:45:01.613" endtime="20260306 19:45:01.633"/>
+</kw>
+<msg timestamp="20260306 19:45:01.638" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No application is open</msg>
+<msg timestamp="20260306 19:45:01.639" level="FAIL">No application is open</msg>
+<status status="FAIL" starttime="20260306 19:45:01.612" endtime="20260306 19:45:01.640"/>
+</kw>
+<status status="FAIL" starttime="20260306 19:45:01.612" endtime="20260306 19:45:01.641">No application is open</status>
+</kw>
+<doc>[PBI-0001] User Authentication Feature
+Test suite for Register, Login with Token, Toggle mode, and Logout</doc>
+<status status="FAIL" starttime="20260306 19:44:56.297" endtime="20260306 19:45:01.641">Suite setup failed:
+Execution terminated by signal
+
+Also suite teardown failed:
+No application is open</status>
+</suite>
+<statistics>
+<total>
+<stat pass="0" fail="1" skip="0">All Tests</stat>
+</total>
+<tag>
+<stat pass="0" fail="0" skip="0" info="combined" combined="NOT robot:exit">NOT robot:exit</stat>
+<stat pass="0" fail="1" skip="0">Feature:Auth</stat>
+<stat pass="0" fail="1" skip="0">Important:Critical</stat>
+<stat pass="0" fail="1" skip="0">Scenario:Success</stat>
+</tag>
+<suite>
+<stat pass="0" fail="1" skip="0" id="s1" name="Auth">Auth</stat>
+</suite>
+</statistics>
+<errors>
+<msg timestamp="20260306 19:45:01.600" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: Execution terminated by signal</msg>
+<msg timestamp="20260306 19:45:01.638" level="WARN">Keyword 'Capture Page Screenshot' could not be run on failure: No application is open</msg>
+</errors>
+</robot>

@@ -96,9 +96,12 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Text(_book!.name, key: const Key('book_name'), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  Text(_book!.name, key: const Key('book_name'), semanticsLabel: 'book_name', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  Chip(key: const Key('book_type'), label: Text(_book!.type.toUpperCase())),
+                  Semantics(
+                    label: 'book_type',
+                    container: true,
+                    child: Chip(key: const Key('book_type'), label: Text(_book!.type.toUpperCase()))),
                   const SizedBox(height: 16),
                   if (_book!.author != null) _DetailRow('Author', _book!.author!, key: const Key('book_author')),
                   if (_book!.isbn != null) _DetailRow('ISBN', _book!.isbn!, key: const Key('book_isbn')),
@@ -108,22 +111,31 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
                   const SizedBox(height: 24),
                   const Text('Create Order', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 8),
-                  TextField(
-                    key: const Key('customer_name_input'),
-                    controller: _nameController,
-                    decoration: const InputDecoration(
-                      labelText: 'Customer Name',
-                      border: OutlineInputBorder(),
+                  Semantics(
+                    label: 'customer_name_input',
+                    container: true,
+                    child: TextField(
+                      key: const Key('customer_name_input'),
+                      controller: _nameController,
+                      decoration: const InputDecoration(
+                        labelText: 'Customer Name',
+                        border: OutlineInputBorder(),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
-                      key: const Key('create_order_button'),
-                      onPressed: _createOrder,
-                      style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
-                      child: const Text('Create Order'),
+                    child: Semantics(
+                      label: 'create_order_button',
+                      container: true,
+                      excludeSemantics: true,
+                      child: ElevatedButton(
+                        key: const Key('create_order_button'),
+                        onPressed: _createOrder,
+                        style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
+                        child: const Text('Create Order'),
+                      ),
                     ),
                   ),
                 ],

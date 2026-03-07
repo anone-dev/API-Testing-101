@@ -36,33 +36,34 @@ stages:
 
           - script: |
               chmod +x $(mockServerDir)/BooksAPI-Linux
-              HEADLESS=1 $(mockServerDir)/BooksAPI-Linux &
+              $(mockServerDir)/BooksAPI-Linux &
               echo $! > /tmp/mock_server.pid
-              sleep 3
-              curl -s http://localhost:$(mockServerPort)/status | python3 -m json.tool
+              sleep 10
+              
+              # Wait for server to be ready
+              for i in {1..30}; do
+                if curl -f http://127.0.0.1:$(mockServerPort)/status 2>/dev/null; then
+                  echo "✅ Mock server is ready"
+                  exit 0
+                fi
+                echo "Waiting for mock server... ($i/30)"
+                sleep 2
+              done
+              
+              echo "❌ Mock server failed to start"
+              cat /tmp/mock_server.pid 2>/dev/null && kill $(cat /tmp/mock_server.pid) 2>/dev/null || true
+              exit 1
             displayName: 'Start Mock Server'
-
-          - task: NodeTool@0
-            inputs:
-              versionSpec: '20.x'
-            displayName: 'Install Node.js'
-
-          - script: |
-              cd $(workingDirectory)
-              npm ci
-            displayName: 'Install dependencies'
-
-          - script: |
-              cd $(workingDirectory)
-              npx playwright install --with-deps chromium
-            displayName: 'Install Playwright browsers'
+            env:
+              HEADLESS: '1'
+              LD_LIBRARY_PATH: '/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu'
 
           - script: |
               cd $(workingDirectory)
               npm run ui:sit:all:cliMode
             displayName: 'Run Web Tests (sit)'
             env:
-              BASE_URL: 'http://localhost:$(mockServerPort)'
+              BASE_URL: 'http://127.0.0.1:$(mockServerPort)'
               ENV: 'sit'
 
           - script: |
@@ -77,18 +78,11 @@ stages:
               testResultsFiles: '$(workingDirectory)/test-results/junit.xml'
               testRunTitle: 'Web Test Results'
 
-          - task: PublishPipelineArtifact@1
-            condition: succeededOrFailed()
-            inputs:
-              targetPath: '$(workingDirectory)/playwright-report'
-              artifact: 'web-test-report'
-              publishLocation: 'pipeline'
-
           - template: templates/publish-test-results-artifacts.yaml@templates
             parameters:
               junitFile: '$(workingDirectory)/test-results/junit.xml'
               reportPath: '$(workingDirectory)/playwright-report'
-              reportArtifactName: 'web-test-report'
+              reportArtifactName: 'web-test-report-template'
               statusArtifactName: 'job-status-noti'
               jobName: 'RunTests'
 

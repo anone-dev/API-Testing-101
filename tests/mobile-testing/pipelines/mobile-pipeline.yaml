@@ -7,46 +7,80 @@ trigger:
     include:
       - tests/mobile-testing/**
 
+resources:
+  repositories:
+  - repository: templates
+    type: git
+    name: pipeline-templates
+    ref: refs/heads/main
+
 pool:
-  vmImage: 'ubuntu-latest'
+  name: 'qa-automation'
 
 variables:
-  - name: workingDirectory
-    value: '$(System.DefaultWorkingDirectory)/tests/mobile-testing'
+- group: notification-config
+- name: AVD_NAME
+  value: 'Mobile_Pixel8Pro'
+- name: RESULTS_DIR
+  value: 'tests/mobile-testing/results/android-sit'
 
 stages:
-  - stage: Mobile_Testing
-    displayName: 'Mobile Testing'
-    jobs:
-      - job: RunTests
-        displayName: 'Run Mobile Tests'
-        steps:
-          - task: UsePythonVersion@0
-            inputs:
-              versionSpec: '3.x'
-              addToPath: true
-            displayName: 'Install Python'
+- stage: MobileAndroidSIT
+  displayName: 'Mobile Android SIT Tests (cliMode)'
+  jobs:
+  - job: RunTests
+    displayName: 'mobile:android:sit:cliMode'
+    steps:
 
-          - script: |
-              cd $(workingDirectory)
-              pip install -r requirements.txt
-            displayName: 'Install dependencies'
+    - script: |
+        # Cleanup before start
+        rm -rf /root/.android/avd/$(AVD_NAME).avd/userdata-qemu.img 2>/dev/null || true
+        rm -rf /root/.android/avd/$(AVD_NAME).avd/snapshots 2>/dev/null || true
 
-          - script: |
-              cd $(workingDirectory)
-              pytest tests/ --junitxml=test-results/junit.xml
-            displayName: 'Run Mobile Tests'
+        emulator -avd $(AVD_NAME) -no-window -no-audio -no-boot-anim \
+          -gpu swiftshader_indirect > /tmp/emulator.log 2>&1 &
+        echo "Emulator PID: $!"
 
-          - task: PublishTestResults@2
-            condition: succeededOrFailed()
-            inputs:
-              testResultsFormat: 'JUnit'
-              testResultsFiles: '$(workingDirectory)/test-results/junit.xml'
-              testRunTitle: 'Mobile Test Results'
+        echo "Waiting for ADB..."
+        timeout 600 adb wait-for-device
 
-          - task: PublishPipelineArtifact@1
-            condition: succeededOrFailed()
-            inputs:
-              targetPath: '$(workingDirectory)/test-results'
-              artifact: 'mobile-test-report'
-              publishLocation: 'pipeline'
+        echo "Waiting for boot..."
+        boot_completed=""
+        count=0
+        while [ "$boot_completed" != "1" ]; do
+          sleep 5
+          boot_completed=$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')
+          count=$((count+1))
+          if [ $count -gt 180 ]; then
+            echo "Timeout: emulator failed to boot"
+            exit 1
+          fi
+        done
+        echo "Emulator ready"
+      displayName: 'Start Android Emulator ($(AVD_NAME))'
+
+    - script: |
+        appium &
+        sleep 10
+      displayName: 'Start Appium server'
+
+    - script: |
+        node run.js android sit headless all
+      workingDirectory: tests/mobile-testing
+      displayName: 'Run mobile:android:sit:cliMode'
+
+    - task: PublishTestResults@2
+      condition: always()
+      inputs:
+        testResultsFormat: 'JUnit'
+        testResultsFiles: '**/output.xml'
+        searchFolder: '$(RESULTS_DIR)'
+        testRunTitle: 'Mobile Android SIT - cliMode'
+      displayName: 'Publish test results'
+
+    - task: PublishBuildArtifacts@1
+      condition: always()
+      inputs:
+        pathToPublish: '$(RESULTS_DIR)'
+        artifactName: 'mobile-android-sit-results'
+      displayName: 'Publish artifacts'

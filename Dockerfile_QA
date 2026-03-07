@@ -1,0 +1,153 @@
+###############################################################################################
+# Dockerfile for building a Docker image with dependencies for testing purposes               #
+# Version: 2.1.1 (Revert to x86_64 with partition size fix - arm64 not supported on x86_64 host)   #
+# Author: QA-CoE Team                                                                 #
+# Date: 2026-02-24                                                                            #
+###############################################################################################
+
+# ใช้ base image ของ Ubuntu 24.04 LTS (GLIBC 2.39)
+FROM ubuntu:24.04
+
+# Set environment variable to reduce prompts during package installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# 1. Install Basic Dependencies & Java 17 (REQUIRED for latest Android SDK)
+# เปลี่ยนจาก default-jdk เป็น openjdk-17-jdk
+RUN apt-get update && apt-get install -y \
+    git jq ca-certificates curl wget unzip gnupg software-properties-common \
+    openjdk-17-jdk build-essential gcc libffi-dev \
+    libgl1-mesa-dev libqt5widgets5 libqt5gui5 libqt5core5a android-tools-adb \
+    && rm -rf /var/lib/apt/lists/*
+
+# 2. Install Python 3.12 (Ubuntu 24.04 มี Python 3.12 เป็น default)
+RUN apt-get update && apt-get install -y python3 python3-pip python3-venv python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# 3. Install Node.js 20.x
+RUN curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/trusted.gpg.d/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && apt-get install -y nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+# 4. Install Google Chrome (Stable .deb)
+# มี apt-get update ก่อน install เพื่อแก้ปัญหา dependencies
+RUN apt-get update && \
+    wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+    && apt-get install -y ./google-chrome-stable_current_amd64.deb \
+    && rm google-chrome-stable_current_amd64.deb \
+    && rm -rf /var/lib/apt/lists/*
+ENV CHROME_BIN=/usr/bin/google-chrome
+
+# 5. Install Testing Tools (Newman, Cypress, Playwright)
+RUN npm install -g newman@6.2.2 newman-reporter-htmlextra@1.23.1 cypress@13.17.0 cross-env
+RUN npm install -g @playwright/test@1.58 typescript@5.7.3 @types/node@24.5.2 dotenv@17.2.3 xlsx@0.18.5 ajv@8.17.1 && \
+    npx playwright install --with-deps chromium firefox webkit
+
+# 6. Install JMeter 5.5
+RUN wget -q https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.5.tgz && \
+    tar -xzf apache-jmeter-5.5.tgz -C /opt && \
+    ln -s /opt/apache-jmeter-5.5/bin/jmeter /usr/local/bin/jmeter && \
+    rm apache-jmeter-5.5.tgz && \
+    curl -L https://jmeter-plugins.org/get/ -o /opt/apache-jmeter-5.5/lib/ext/jmeter-plugins-manager.jar && \
+    wget -q -O /opt/apache-jmeter-5.5/lib/ext/ApacheJmeter_Schema_Assertion-1.1.0.jar \
+    https://github.com/yeshan333/ApacheJmeter_Schema_Assertion/releases/download/v1.1.0/ApacheJmeter_Schema_Assertion-1.1.0.jar
+
+# 7. ====== Android SDK & Emulator Setup ======
+# แก้ไข JAVA_HOME ให้ชี้ไปที่ Java 17
+ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+ENV ANDROID_HOME=/opt/android-sdk
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator
+
+# Download Command Line Tools & Setup Directory Structure
+RUN mkdir -p ${ANDROID_HOME}/cmdline-tools \
+    && cd ${ANDROID_HOME}/cmdline-tools \
+    && wget -q https://dl.google.com/android/repository/commandlinetools-linux-14742923_latest.zip -O commandlinetools.zip \
+    && unzip -q commandlinetools.zip \
+    && mv cmdline-tools latest \
+    && rm commandlinetools.zip
+
+# Accept Licenses, Install System Images, Create AVDs - single layer to minimize disk usage
+RUN yes | sdkmanager --licenses \
+    && sdkmanager "platform-tools" "emulator" "build-tools;34.0.0" \
+        "system-images;android-35;google_apis;x86_64" \
+        "system-images;android-31;google_apis;x86_64" \
+    && mkdir -p /root/.android/avd \
+    && echo "no" | avdmanager create avd -n "Mobile_Pixel8Pro" \
+        -k "system-images;android-35;google_apis;x86_64" --force \
+    && printf "hw.lcd.width=1344\nhw.lcd.height=2992\nhw.lcd.density=480\nhw.initialOrientation=Portrait\nskin.name=1344x2992\n" \
+        >> /root/.android/avd/Mobile_Pixel8Pro.avd/config.ini \
+    && echo "no" | avdmanager create avd -n "Tablet_PixelTablet" \
+        -k "system-images;android-35;google_apis;x86_64" --force \
+    && printf "hw.lcd.width=2560\nhw.lcd.height=1600\nhw.lcd.density=320\nhw.initialOrientation=Landscape\nskin.name=2560x1600\n" \
+        >> /root/.android/avd/Tablet_PixelTablet.avd/config.ini \
+    && echo "no" | avdmanager create avd -n "POS_IMIN_SWAN1" \
+        -k "system-images;android-31;google_apis;x86_64" --force \
+    && printf "hw.lcd.width=1920\nhw.lcd.height=1080\nhw.lcd.density=240\nhw.initialOrientation=Landscape\nskin.name=1920x1080\n" \
+        >> /root/.android/avd/POS_IMIN_SWAN1.avd/config.ini \
+    && rm -rf ${ANDROID_HOME}/.temp ${ANDROID_HOME}/temp 2>/dev/null || true
+
+# 8. Robot Framework & Python Libraries
+RUN python3 -m pip install --break-system-packages robotframework==6.0.1 \
+    robotframework-assertion-engine==3.0.3 \
+    robotframework-csvlibrary==0.0.5 \
+    robotframework-databaselibrary==2.0.2 \
+    robotframework-excellib==2.0.1 \
+    robotframework-faker==5.0.0 \
+    robotframework-jsonlibrary==0.5 \
+    robotframework-pabot==4.2.0 \
+    robotframework-pythonlibcore==4.4.1 \
+    robotframework-redislibrary==1.2.5 \
+    robotframework-requests==0.9.7 \
+    robotframework-seleniumlibrary==6.6.1 \
+    robotframework-stacktrace==0.4.1 \
+    robotframework-yamllibrary==0.2.8 \
+    setuptools cffi cryptography oracledb psycopg2-binary==2.9.10
+
+# 9. Database Clients
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+
+# Oracle Instant Client
+# Ubuntu 24.04 ใช้ libaio1t64 แทน libaio1
+RUN apt-get update && apt-get install -y libaio1t64 && \
+    mkdir -p /opt/oracle && cd /opt/oracle && \
+    wget -q https://download.oracle.com/otn_software/linux/instantclient/2113000/instantclient-basiclite-linux.x64-21.13.0.0.0dbru.zip && \
+    unzip -q instantclient-basiclite-linux.x64-21.13.0.0.0dbru.zip && \
+    wget -q https://download.oracle.com/otn_software/linux/instantclient/2113000/instantclient-sqlplus-linux.x64-21.13.0.0.0dbru.zip && \
+    unzip -q instantclient-sqlplus-linux.x64-21.13.0.0.0dbru.zip && \
+    sh -c "echo /opt/oracle/instantclient_21_13 > /etc/ld.so.conf.d/oracle-instantclient.conf" && \
+    ldconfig && \
+    rm -rf *.zip && \
+    rm -rf /var/lib/apt/lists/*
+
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_21_13
+ENV PATH=$PATH:/opt/oracle/instantclient_21_13
+
+# 10. Final Configurations
+RUN ln -sf /usr/share/zoneinfo/Asia/Bangkok /etc/localtime
+
+ENV PATH=$PATH:/usr/local/bin/geckodriver \
+    GECKODRIVER_LOG_FILE=/var/log/geckodriver.log \
+    SELENIUM_LIBRARY_TIMEOUT=60 \
+    SELENIUM_WAIT_TIMEOUT=10 \
+    ROBOT_SYSLOG_FILE=/var/log/robot_framework.log \
+    TS_NODE_BASEURL=/usr/lib/node_modules \
+    NODE_PATH=/usr/lib/node_modules:/usr/local/lib/node_modules
+
+WORKDIR /azp
+
+RUN mkdir -p /azp/node_modules && \
+    ln -s /usr/lib/node_modules/@playwright /azp/node_modules/@playwright && \
+    ln -s /usr/lib/node_modules/@types /azp/node_modules/@types && \
+    ln -s /usr/lib/node_modules/typescript /azp/node_modules/typescript && \
+    ln -s /usr/lib/node_modules/dotenv /azp/node_modules/dotenv && \
+    ln -s /usr/lib/node_modules/ajv /azp/node_modules/ajv
+
+ENV TARGETARCH=linux-x64
+COPY ./start.sh .
+RUN chmod +x start.sh
+
+COPY ./entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+CMD ["./entrypoint.sh"]

@@ -1,14 +1,70 @@
-# Playwright
+# Playwright Reports & Artifacts
 node_modules/
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+/trace/
+/videos/
+/screenshots/
 
-# Environment - Only ignore local environment files
+# Environment Files - Only ignore local
 .env.local
 
-# Keep SIT and UAT environment files
-# .env (SIT) - tracked
-# .env.uat - tracked
+# Keep tracked: .env (SIT default), .env.uat
+
+# TypeScript Build
+*.js.map
+*.d.ts
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*.iml
+
+# OS
+.DS_Store
+Thums.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Test Artifacts
+*.tmp
+*.bak
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Sensitive Data
+**/credentials.json
+**/secrets.json
+*.pem
+*.key
+*.cert
+
+# Package Manager
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Coverage Reports
+coverage/
+.nyc_output/
+*.lcov
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache

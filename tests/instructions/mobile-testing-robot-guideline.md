@@ -33,68 +33,53 @@
 
 ```
 mobile-testing/
-├── 📂 tests-mobile/                # Test cases by platform
-│   ├── android/                    # Android test cases
-│   │   ├── auth/                   # Authentication tests
-│   │   ├── payment/                # Payment tests
-│   │   └── profile/                # Profile tests
-│   ├── ios/                        # iOS test cases
-│   │   ├── auth/                   # Authentication tests
-│   │   ├── payment/                # Payment tests
-│   │   └── profile/                # Profile tests
-│   └── tagged-tests/               # Smoke & Regression tests
-│       ├── smoke.android.robot
-│       ├── smoke.ios.robot
-│       ├── regression.android.robot
-│       └── regression.ios.robot
-├── 📂 pages/                       # Page Object Model
-│   ├── android/                    # Android page objects
-│   │   ├── common/                 # Common keywords
-│   │   ├── auth/                   # LoginPage, RegisterPage
-│   │   ├── payment/                # Payment page objects
-│   │   └── profile/                # Profile page objects
-│   └── ios/                        # iOS page objects (same structure)
-├── 📂 fixtures/                    # Test data per environment
-│   ├── android/                    # Android test data
-│   │   ├── local.yaml              # Local test data
-│   │   ├── sit.yaml                # SIT test data
-│   │   └── uat.yaml                # UAT test data
-│   └── ios/                        # iOS test data (same structure)
-├── 📂 helpers/                     # Python utility functions
-│   ├── app_manager.py              # App version management
-│   ├── testdata_loader.py          # Load YAML test data
-│   └── database_helper.py          # Database operations
-├── 📂 apps/                        # App binaries (.apk, .app, .ipa)
-│   ├── android/                    # Android apps
-│   │   ├── local/                  # Local environment apps
-│   │   ├── sit/                    # SIT environment apps
-│   │   └── uat/                    # UAT environment apps
-│   ├── ios/                        # iOS apps
-│   │   ├── local/                  # Local environment apps
-│   │   ├── sit/                    # SIT environment apps
-│   │   └── uat/                    # UAT environment apps
-│   └── versions.json               # App version tracking
-├── 📂 db-scripts/                  # Database setup scripts
-│   ├── setup.local.sql             # Local data setup
-│   ├── setup.sit.sql               # SIT data setup
-│   ├── setup.uat.sql               # UAT data setup
-│   └── cleanup.sql                 # Cleanup script
-├── 📂 pipelines/                   # CI/CD pipeline configs
-│   ├── mobile-android-pipeline.yaml
-│   ├── mobile-ios-pipeline.yaml
-│   └── mobile-pipeline.yaml
-├── 📂 reports/                     # Test execution reports
-│   ├── report.html                 # HTML report
-│   ├── log.html                    # Detailed log
-│   └── output.xml                  # XML output
-├── 📄 .env.android.local           # Android Local config
-├── 📄 .env.android.sit             # Android SIT config (default)
-├── 📄 .env.android.uat             # Android UAT config
-├── 📄 .env.ios.local               # iOS Local config
-├── 📄 .env.ios.sit                 # iOS SIT config (default)
-├── 📄 .env.ios.uat                 # iOS UAT config
-├── 📄 requirements.txt             # Python dependencies
-└── 📄 README.md                    # Project documentation
+├── 📂 tests-mobile/                # Test files organized by features
+│   ├── auth/
+│   │   ├── auth.robot
+│   │   └── login.robot
+│   ├── books/
+│   │   └── books.robot
+│   ├── orders/
+│   │   └── orders.robot
+│   └── tagged_tests/
+│       ├── smoke.robot
+│       └── regression.robot
+├── 📂 pages/                       # Page Object Model (Shared logic for Flutter)
+│   ├── common/
+│   │   └── BasePage.resource
+│   ├── auth/
+│   │   ├── AuthPage.resource
+│   │   └── LoginPage.resource
+│   ├── books/
+│   │   └── BooksPage.resource
+│   ├── dashboard/
+│   │   └── DashboardPage.resource
+│   └── orders/
+│       └── OrdersPage.resource
+├── 📂 fixtures/                    # Test data + Appium capabilities per env/platform
+│   ├── testdata.local.android.yaml
+│   ├── testdata.local.ios.yaml
+│   ├── testdata.sit.android.yaml
+│   └── testdata.sit.ios.yaml
+├── 📂 helpers/
+│   ├── __init__.py
+│   ├── env_loader.py
+│   ├── testdata_loader.py
+│   ├── database_helper.py
+│   └── app_manager.py
+├── 📂 apps/
+│   ├── .keep
+│   └── app-release.apk
+├── 📂 db-scripts/
+│   ├── setup.local.sql
+│   ├── setup.sit.sql
+│   ├── cleanup.sql
+│   └── README.md
+├── 📂 pipelines/
+│   ├── mobile-pipeline.yaml
+│   └── azure-pipelines-env-emulator-verification.yml
+├── 📄 requirements.txt
+└── 📄 README.md
 ```
 
 ---
@@ -346,14 +331,9 @@ Resource         ../pages/android/auth/LoginPage.robot
 ```
 📁 โครงสร้างที่จะสร้าง:
 tests-mobile/
-├── android/
-│   └── auth/
-│       ├── userLogin.robot
-│       └── passwordReset.robot
-└── ios/
-    └── auth/
-        ├── userLogin.robot
-        └── passwordReset.robot
+└── auth/
+    ├── userLogin.robot
+    └── passwordReset.robot
 ```
 
 #### 4️⃣ Implementation Plan
@@ -382,12 +362,14 @@ tests-mobile/
 - Use descriptive test case and keyword names
 - **MANDATORY: Add Feature:, Important: and Scenario: tags to EVERY test**
 - Use Test Case ID format: `[TC-XXXX]`
-- Follow Page Object pattern with resource files
+- Follow Page Object pattern with .resource files
+- Use Accessibility IDs for Flutter compatibility
 - Use proper element waiting strategies
 - Implement error handling with TRY/EXCEPT
 - Capture screenshots for failures
 - Log important actions and verifications
 - Ask before modifying files
+- Use shared page objects (no platform-specific duplication)
 
 ### ❌ DON'Ts
 - Write code without confirmation
@@ -398,6 +380,7 @@ tests-mobile/
 - **NEVER skip Feature:, Important: and Scenario: tags**
 - Use unclear variable names
 - Tap without waiting for elements
+- Create separate Android/iOS test files (use shared tests)
 
 ---
 
@@ -408,8 +391,18 @@ tests-mobile/
 *** Settings ***
 Documentation    [PBI-1234] User Login Feature
 Library          AppiumLibrary
-Resource         ../../pages/android/auth/LoginPage.robot
-Resource         ../../pages/android/common/CommonKeywords.robot
+Resource         ../../pages/auth/LoginPage.resource
+Resource         ../../pages/common/BasePage.resource
+Variables        ../../fixtures/testdata.${ENV}.${PLATFORM}.yaml
+
+Suite Setup       Setup Mobile Test
+Suite Teardown    Teardown Mobile Test
+
+*** Variables ***
+# กำหนดค่า Default ไว้ (เผื่อลืมใส่ตอนรัน)
+${PLATFORM}    android
+${ENV}         local
+${HEADLESS}    false
 
 *** Test Cases ***
 [TC-001] User Should Login Successfully With Valid Credentials
@@ -417,19 +410,31 @@ Resource         ../../pages/android/common/CommonKeywords.robot
     [Tags]    Feature:Login    Important:Critical    Scenario:Success
     
     # 📝 Arrange - Setup test data
-    ${username}=    Set Variable    test@example.com
-    ${password}=    Set Variable    password123
+    ${username}=    Set Variable    ${USERS.valid.username}
+    ${password}=    Set Variable    ${USERS.valid.password}
     
     # 🎬 Act - Perform login
-    Open Mobile Application
+    Verify Login Page Displayed
     Input Username    ${username}
     Input Password    ${password}
-    Tap Login Button
+    Click Login Button
     
     # ✅ Assert - Verify dashboard
-    Wait Until Element Is Visible    id=dashboard    timeout=10s
-    Element Should Be Visible    id=welcome-message
-    Element Text Should Contain    id=welcome-message    Welcome
+    Wait Until Element Is Visible    accessibility_id=dashboard    timeout=10s
+    Element Should Be Visible    accessibility_id=welcome_message
+
+*** Keywords ***
+Setup Mobile Test
+    Open Application    http://localhost:4723/wd/hub
+    ...    platformName=${PLATFORM_NAME}
+    ...    platformVersion=${PLATFORM_VERSION}
+    ...    deviceName=${DEVICE_NAME}
+    ...    app=${APP_PATH}
+    ...    automationName=${AUTOMATION_NAME}
+    ...    noReset=${NO_RESET}
+
+Teardown Mobile Test
+    Close Application
 ```
 
 ### 📱 Mobile Interaction Patterns
@@ -545,32 +550,42 @@ python-dotenv==1.0.0
 
 ## 🚀 Running Tests
 
-### Android Tests
+### Run All Tests
+ทุก `.robot` มี default variables (`ENV=local`, `PLATFORM=android`) ไว้แล้ว สามารถ override ได้ผ่าน `--variable`:
+
 ```bash
-# Run all Android tests (SIT)
-robot tests-mobile/android/
+# Android Local (ใช้ default — ไม่ต้องใส่ --variable)
+robot tests-mobile/
 
-# Run specific feature
-robot tests-mobile/android/auth/
+# Android SIT
+robot --variable ENV:sit tests-mobile/
 
-# Run with environment
-robot --variable ENV:local tests-mobile/android/
+# iOS Local
+robot --variable PLATFORM:ios tests-mobile/
 
-# Run with tags
-robot --include Feature:Login tests-mobile/android/
-robot --include Important:Critical tests-mobile/android/
+# iOS SIT
+robot --variable ENV:sit --variable PLATFORM:ios tests-mobile/
 ```
 
-### iOS Tests
+### Specific Suite
 ```bash
-# Run all iOS tests (SIT)
-robot tests-mobile/ios/
+robot --variable ENV:local --variable PLATFORM:android tests-mobile/auth/auth.robot
+robot --variable ENV:sit   --variable PLATFORM:android tests-mobile/books/books.robot
+robot --variable ENV:sit   --variable PLATFORM:ios     tests-mobile/orders/orders.robot
+```
 
-# Run specific feature
-robot tests-mobile/ios/auth/
+### With Tags
+```bash
+robot --variable ENV:local --variable PLATFORM:android --include smoke              tests-mobile/
+robot --variable ENV:local --variable PLATFORM:android --include regression         tests-mobile/
+robot --variable ENV:sit   --variable PLATFORM:android --include Feature:Auth       tests-mobile/
+robot --variable ENV:sit   --variable PLATFORM:android --include Important:Critical tests-mobile/
+```
 
-# Run with environment
-robot --variable ENV:uat tests-mobile/ios/
+### With Output Directory
+```bash
+robot --variable ENV:local --variable PLATFORM:android --outputdir results/android-local tests-mobile/
+robot --variable ENV:sit   --variable PLATFORM:ios     --outputdir results/ios-sit       tests-mobile/
 ```
 
 ---

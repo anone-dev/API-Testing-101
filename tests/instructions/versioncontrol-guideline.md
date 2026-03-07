@@ -10,17 +10,20 @@
 - ✅ เหมาะสำหรับ: การแก้ไขเล็กน้อย, hotfix, ทำงานคนเดียว
 - ✅ รวดเร็ว ไม่ต้องรอ review
 - ⚠️ ข้อควรระวัง: ไม่มี code review, ต้องระมัดระวังเป็นพิเศษ
-- 📝 Commit format: `[AB#xxxxx,AB#yyyyy] Description` (ไม่มี [PR])
+- 📝 Commit format: `[AB#xxxxx, AB#yyyyy] Description`
   - **AB#xxxxx** = Test Scenario ID บน Azure Board
-  - ตัวอย่าง: AB#107778, AB#107779
+  - **สำคัญ**: ใช้ brackets และคั่นด้วย comma + เว้นวรรค เพื่อให้ Azure Board link ได้ถูกต้อง
+  - ตัวอย่าง: `[AB#107778, AB#107779] Add test script`
 
 ### 📌 Option 2: Pull Request Workflow (แบบต้องทำ PR)
 - ✅ เหมาะสำหรับ: Feature ใหม่, การแก้ไขใหญ่, ทำงานหลายคน
 - ✅ มี code review, ปลอดภัยกว่า
 - ⚠️ ข้อควรระวัง: ใช้เวลานานกว่า ต้องรอ approval
-- 📝 Commit format: `[PR][AB#xxxxx,AB#yyyyy] Description` (มี [PR])
+- 📝 Commit format: `[PR][AB#xxxxx, AB#yyyyy] Description`
+  - **[PR]** = ระบุว่าเป็น Pull Request workflow
   - **AB#xxxxx** = Test Scenario ID บน Azure Board
-  - ตัวอย่าง: AB#107778, AB#107779
+  - **สำคัญ**: ใช้ [PR] prefix เพื่อแยกจาก Direct Commit
+  - ตัวอย่าง: `[PR][AB#107778, AB#107779] Add test script`
 
 **💡 คำแนะนำ:** ถามผู้ใช้ก่อนเริ่มว่าต้องการใช้วิธีไหน
 
@@ -73,15 +76,17 @@ git add .
 
 ### 2.3 Commit โดยตรงบน main
 ```bash
-# Format: [AB#xxxxx,AB#yyyyy] Description (ไม่มี [PR])
+# Format: [AB#xxxxx, AB#yyyyy] Description
 # AB#xxxxx = Test Scenario ID บน Azure Board
-git commit -m "[AB#107778,AB#107779] Add test script F3S1, F3S2"
+# สำคัญ: ใช้ brackets และคั่นด้วย comma + เว้นวรรค
+git commit -m "[AB#107778, AB#107779] Add test script F3S1, F3S2"
 ```
 
 **Commit Message Format (Direct):**
-- `[AB#107778,AB#107779] Add test script F3S1, F3S2`
+- `[AB#107778, AB#107779] Add test script F3S1, F3S2`
 - `[AB#107780] Update test data for F3S1`
 - `[AB#107781] Fix API endpoint configuration`
+- `[AB#12569, AB#12570, AB#12571] Remove old test files` (หลาย IDs)
 
 ## 3. Push ขึ้น Remote
 
@@ -177,7 +182,7 @@ git status
 3. ค้นหา Work Items ด้วย Azure DevOps Search API
 4. **กรอง Work Items ที่มีคำว่า "Automate" ใน Title เท่านั้น** (case-insensitive)
 5. แสดงผลลัพธ์และให้เลือก Work Items (เฉพาะ Axons Test Scenario ที่ผ่านการกรอง)
-6. สร้าง Work Items string: `AB#107778,AB#107779`
+6. สร้าง Work Items string: `[PR][AB#107778, AB#107779]` (เพิ่ม [PR] prefix สำหรับ Pull Request)
 
 **Work Item Types ที่ค้นหา:**
 - **AXONS Test Scenario v2** (เท่านั้น)
@@ -196,16 +201,18 @@ git status
 
 ### 4.4 Commit พร้อม Message และ Work Items
 ```bash
-# รูปแบบ: [PR][AB#xxxxx,AB#yyyyy] Description (มี [PR])
+# รูปแบบ: [PR][AB#xxxxx, AB#yyyyy] Description
+# [PR] = ระบุว่าเป็น Pull Request workflow
 # AB#xxxxx = Test Scenario ID บน Azure Board
-git commit -m "[PR][AB#107778,AB#107779] Add test script F3S1, F3S2"
+# สำคัญ: เพิ่ม [PR] prefix เพื่อแยกจาก Direct Commit
+git commit -m "[PR][AB#107778, AB#107779] Add test script F3S1, F3S2"
 ```
 
 **Commit Message Format (PR Workflow):**
-- `[PR][AB#xxxxx,AB#yyyyy] Add test script F3S1, F3S2`
-- `[PR][AB#xxxxx,AB#yyyyy] Update test script F3S1`
-- `[PR][AB#xxxxx,AB#yyyyy] Fix test scripts`
-- `[PR][AB#xxxxx] Refactor test data structure`
+- `[PR][AB#107778, AB#107779] Add test script F3S1, F3S2`
+- `[PR][AB#107780] Update test script F3S1`
+- `[PR][AB#107781] Fix test scripts`
+- `[PR][AB#107782] Refactor test data structure`
 
 
 ---
@@ -290,7 +297,7 @@ git push
 **Title และ Description จะถูกดึงจาก Commit Message อัตโนมัติ:**
 
 **ถ้ามี 1 commit:**
-- Title: `[PR][AB#107778,AB#107779] Add test script F3S1, F3S2`
+- Title: `[PR][AB#107778, AB#107779] Add test script F3S1, F3S2`
 - Description: ใช้ commit message เดียวกัน
 
 **ถ้ามีหลาย commits:**
@@ -318,19 +325,20 @@ git push
 
 **Direct Commit (Option 1):**
 ```
-[AB#xxxxx,AB#yyyyy] Description
+[AB#xxxxx, AB#yyyyy] Description
 ```
-- **AB#xxxxx** = Test Scenario ID บน Azure Board (Work Item ID)
-- **xxxxx** = เลข ID ของ Test Scenario
-- ตัวอย่าง: AB#107778, AB#107779
+- ไม่มี [PR] prefix
+- ตัวอย่าง: `[AB#107778, AB#107779] Add test script`
 
 **Pull Request (Option 2):**
 ```
-[PR][AB#xxxxx,AB#yyyyy] Description
+[PR][AB#xxxxx, AB#yyyyy] Description
 ```
+- มี [PR] prefix เพื่อระบุว่าเป็น Pull Request workflow
 - **AB#xxxxx** = Test Scenario ID บน Azure Board (Work Item ID)
+- **สำคัญ**: ใช้ [PR] prefix เพื่อแยกความแตกต่างจาก Direct Commit
 - **xxxxx** = เลข ID ของ Test Scenario
-- ตัวอย่าง: AB#107778, AB#107779
+- ตัวอย่าง: `[PR][AB#107778, AB#107779] Add test script`
 
 ### Description Guidelines
 - ใช้ภาษาอังกฤษ
@@ -340,20 +348,22 @@ git push
 
 ### ตัวอย่าง Good Commit Messages
 
-**Direct Commit:**
 ```bash
-[AB#107778,AB#107779] Add test script F3S1, F3S2
+# Direct Commit (Option 1)
+[AB#107778, AB#107779] Add test script F3S1, F3S2
 [AB#107780] Add automated test files for F3S1
 [AB#107781] Fix login API test data
 [AB#107782] Update test script F3S1
-```
 
-**Pull Request:**
-```bash
-[PR][AB#107778,AB#107779] Add test script F3S1, F3S2
-[PR][AB#107780] Add automated test files for F3S1
-[PR][AB#107781] Fix login API test data
-[PR][AB#107782] Update test script F3S1
+# Pull Request (Option 2)
+[PR][AB#107778, AB#107779] Add test script F3S1, F3S2
+[PR][AB#107780] Update test script F3S1
+[PR][AB#107781] Fix test scripts
+[PR][AB#107782] Refactor test data structure
+
+# กรณีมี Work Items จำนวนมาก
+[AB#12569, AB#12570, AB#12571, AB#12572, AB#12573] Remove old test files
+[PR][AB#12569, AB#12570, AB#12571] Update multiple test scenarios
 ```
 
 ### ตัวอย่าง Bad Commit Messages
@@ -364,8 +374,20 @@ Add test files
 # ❌ Description ไม่ชัดเจน
 [AB#107778] Update
 
-# ❌ Format ไม่ถูกต้อง
-AB#107778 Add test files  # ขาด brackets
+# ❌ ไม่มี brackets (ไม่ตามมาตรฐาน)
+AB#107778 AB#107779 Add test files
+
+# ❌ ไม่มีเว้นวรรคหลัง comma
+[AB#107778,AB#107779] Add test files
+
+# ❌ PR workflow แต่ไม่มี [PR] prefix
+[AB#107778, AB#107779] Add test files  # ควรเป็น [PR][AB#107778, AB#107779]
+
+# ❌ Direct commit แต่มี [PR] prefix
+[PR][AB#107778, AB#107779] Fix hotfix  # ไม่ควรมี [PR] ถ้า commit ตรงบน main
+
+# ❌ ใช้ range แทนระบุทีละตัว
+[AB#12569-12593] Add test files
 ```
 
 ---
@@ -380,7 +402,7 @@ git pull origin main
 
 # 2. Make changes & commit
 git add .
-git commit -m "[AB#xxxxx,AB#yyyyy] Description"
+git commit -m "[AB#xxxxx, AB#yyyyy] Description"
 
 # 3. Push to main
 git push origin main
@@ -401,7 +423,7 @@ git checkout -b automated-files/xxxx
 
 # 4. Make changes & commit
 git add .
-git commit -m "[PR][AB#xxxxx,AB#yyyyy] Description"
+git commit -m "[PR][AB#xxxxx, AB#yyyyy] Description"
 
 # 5. [Optional] Sync with remote
 git checkout main && git pull origin main

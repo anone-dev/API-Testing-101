@@ -4,65 +4,73 @@
 ```bash
 # Install dependencies
 pip install -r requirements.txt
-npm install -g appium
-appium driver install uiautomator2
-appium driver install xcuitest
 
 # Start Appium
 appium
 ```
 
-## Android Tests
+## Variable Files (Environment × Platform)
+| File | Platform | Environment |
+|------|----------|-------------|
+| `fixtures/testdata.local.android.yaml` | Android | Local |
+| `fixtures/testdata.local.ios.yaml` | iOS | Local |
+| `fixtures/testdata.sit.android.yaml` | Android | SIT |
+| `fixtures/testdata.sit.ios.yaml` | iOS | SIT |
+
+## Run Tests
 ```bash
-# SIT Environment
-robot tests-mobile/android/
-robot tests-mobile/android/auth/login.robot
-robot tests-mobile/tagged-tests/smoke.android.robot
-robot tests-mobile/tagged-tests/regression.android.robot
+# รูปแบบ: robot --variable ENV:<env> --variable PLATFORM:<platform> [options] <suite>
 
-# UAT Environment
-robot --variable ENV:uat tests-mobile/android/
+# Android Local (default)
+robot tests-mobile/
 
-# With tags
-robot --include smoke tests-mobile/android/
-robot --include regression tests-mobile/android/
-robot --include auth tests-mobile/android/
+# Android SIT
+robot --variable ENV:sit tests-mobile/
+
+# iOS Local
+robot --variable PLATFORM:ios tests-mobile/
+
+# iOS SIT
+robot --variable ENV:sit --variable PLATFORM:ios tests-mobile/
 ```
 
-## iOS Tests
+## Specific Suite
 ```bash
-# SIT Environment
-robot tests-mobile/ios/
-robot tests-mobile/ios/auth/login.robot
-robot tests-mobile/tagged-tests/smoke.ios.robot
-robot tests-mobile/tagged-tests/regression.ios.robot
+robot --variable ENV:local --variable PLATFORM:android tests-mobile/auth/auth.robot
+robot --variable ENV:local --variable PLATFORM:android tests-mobile/books/books.robot
+robot --variable ENV:local --variable PLATFORM:android tests-mobile/orders/orders.robot
+robot --variable ENV:sit   --variable PLATFORM:android tests-mobile/
+robot --variable ENV:sit   --variable PLATFORM:ios     tests-mobile/
+```
 
-# UAT Environment
-robot --variable ENV:uat tests-mobile/ios/
+## With Tags
+```bash
+robot --variable ENV:local --variable PLATFORM:android --include smoke      tests-mobile/
+robot --variable ENV:local --variable PLATFORM:android --include regression tests-mobile/
+robot --variable ENV:sit   --variable PLATFORM:android --include Feature:Auth tests-mobile/
+```
 
-# With tags
-robot --include smoke tests-mobile/ios/
-robot --include regression tests-mobile/ios/
+## With Output Directory
+```bash
+robot --variable ENV:local --variable PLATFORM:android --outputdir results/android-local tests-mobile/
+robot --variable ENV:sit   --variable PLATFORM:ios     --outputdir results/ios-sit       tests-mobile/
 ```
 
 ## Parallel Execution
 ```bash
-# Run with pabot
-pabot --processes 2 tests-mobile/android/
-pabot --processes 2 tests-mobile/android/ tests-mobile/ios/
+pip install robotframework-pabot
 
-# Run specific tests in parallel
-pabot --processes 2 --include smoke tests-mobile/
+pabot --processes 2 --variable ENV:local --variable PLATFORM:android tests-mobile/
+pabot --processes 2 --variable ENV:sit   --variable PLATFORM:ios     tests-mobile/
 ```
 
 ## Reports
 ```bash
-# Generate reports in specific directory
-robot --outputdir results tests-mobile/android/
+# View reports (Windows)
+start results\android-local\report.html
 
-# View reports
-open results/report.html
-open results/log.html
+# View reports (macOS/Linux)
+open results/android-local/report.html
 ```
 
 ## Device Management
@@ -73,19 +81,14 @@ adb kill-server && adb start-server
 
 # iOS
 xcrun simctl list devices
-xcrun simctl boot "iPhone 14 Pro"
-xcrun simctl shutdown "iPhone 14 Pro"
+xcrun simctl boot "iPhone 14"
+xcrun simctl shutdown "iPhone 14"
 ```
 
 ## Debugging
 ```bash
-# Run with debug level logging
-robot --loglevel DEBUG tests-mobile/android/auth/login.robot
-
-# Run Appium with debug logs
+robot --variable ENV:local --variable PLATFORM:android --loglevel DEBUG tests-mobile/auth/auth.robot
 appium --log-level debug
-
-# Check Appium doctor
 appium-doctor --android
 appium-doctor --ios
 ```
@@ -93,17 +96,14 @@ appium-doctor --ios
 ## App Management
 ```bash
 # Download from Azure DevOps
-az pipelines runs artifact download --artifact-name android-sit --path apps/android/sit/
+az pipelines runs artifact download --artifact-name android-sit --path apps/
 
 # Download from AWS S3
-aws s3 cp s3://builds/android/sit/app-latest.apk apps/android/sit/
+aws s3 cp s3://builds/android/sit/app-latest.apk apps/app-release.apk
 ```
 
 ## Database
 ```bash
-# Setup database
 mysql -u root -p testdb < db-scripts/setup.sit.sql
-
-# Cleanup database
 mysql -u root -p testdb < db-scripts/cleanup.sql
 ```

@@ -9,18 +9,18 @@ class TestDataLoader:
         self.base_dir = Path(__file__).parent.parent
         self.fixtures_dir = self.base_dir / 'fixtures'
     
-    def load_test_data(self, platform: str, env: str) -> Dict[str, Any]:
+    def load_test_data(self, env: str = 'sit', platform: str = 'android') -> Dict[str, Any]:
         """
-        Load test data for specific platform and environment
+        Load test data for specific environment and platform
         
         Args:
+            env: 'local' or 'sit'
             platform: 'android' or 'ios'
-            env: 'sit' or 'uat'
         
         Returns:
             Dictionary containing test data
         """
-        file_path = self.fixtures_dir / platform / f"{env}.yaml"
+        file_path = self.fixtures_dir / f"testdata.{env}.{platform}.yaml"
         
         if not file_path.exists():
             raise FileNotFoundError(f"Test data file not found: {file_path}")
@@ -46,7 +46,7 @@ class TestDataLoader:
         with open(file_path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f)
     
-    def get_user_credentials(self, platform: str, env: str, user_type: str = 'valid') -> Dict[str, str]:
+    def get_user_credentials(self, env: str = 'sit', platform: str = 'android', user_type: str = 'valid') -> Dict[str, str]:
         """Get user credentials for login"""
-        data = self.load_test_data(platform, env)
+        data = self.load_test_data(env, platform)
         return data['USERS'][user_type]

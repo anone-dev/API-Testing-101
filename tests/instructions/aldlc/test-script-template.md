@@ -69,63 +69,53 @@ project-root/
     │   └── package.json          # Dependencies & scripts
     │
     ├── mobile-testing/           # 📱 Mobile Testing with Robot Framework + Appium
-    │   ├── tests-mobile/         # Test cases by platform
-    │   │   ├── android/          # Android test cases
-    │   │   │   ├── auth/         # Authentication tests
-    │   │   │   ├── payment/      # Payment tests
-    │   │   │   └── profile/      # Profile tests
-    │   │   ├── ios/              # iOS test cases
-    │   │   │   ├── auth/         # Authentication tests
-    │   │   │   ├── payment/      # Payment tests
-    │   │   │   └── profile/      # Profile tests
-    │   │   └── tagged-tests/     # Smoke & Regression tests
-    │   │       ├── smoke.android.robot
-    │   │       ├── smoke.ios.robot
-    │   │       ├── regression.android.robot
-    │   │       └── regression.ios.robot
-    │   ├── pages/                # Page Object Model
-    │   │   ├── android/          # Android page objects
-    │   │   │   ├── common/       # Common keywords
-    │   │   │   ├── auth/         # LoginPage, RegisterPage
-    │   │   │   ├── payment/      # Payment page objects
-    │   │   │   └── profile/      # Profile page objects
-    │   │   └── ios/              # iOS page objects (same structure)
-    │   ├── fixtures/             # Test data per environment
-    │   │   ├── android/          # Android test data
-    │   │   │   ├── local.yaml    # Local test data
-    │   │   │   ├── sit.yaml      # SIT test data
-    │   │   │   └── uat.yaml      # UAT test data
-    │   │   └── ios/              # iOS test data (same structure)
-    │   ├── helpers/              # Python utility functions
-    │   │   ├── app_manager.py    # App version management
-    │   │   ├── testdata_loader.py  # Load YAML test data
-    │   │   └── database_helper.py  # Database operations
-    │   ├── apps/                 # App binaries (.apk, .app, .ipa)
-    │   │   ├── android/          # Android apps
-    │   │   │   ├── local/        # Local environment apps
-    │   │   │   ├── sit/          # SIT environment apps
-    │   │   │   └── uat/          # UAT environment apps
-    │   │   ├── ios/              # iOS apps
-    │   │   │   ├── local/        # Local environment apps
-    │   │   │   ├── sit/          # SIT environment apps
-    │   │   │   └── uat/          # UAT environment apps
-    │   │   └── versions.json     # App version tracking
-    │   ├── db-scripts/           # Database setup scripts
-    │   │   ├── setup.local.sql   # Local data setup
-    │   │   ├── setup.sit.sql     # SIT data setup
-    │   │   ├── setup.uat.sql     # UAT data setup
-    │   │   └── cleanup.sql       # Cleanup script
-    │   ├── pipelines/            # CI/CD pipeline configs
-    │   │   ├── mobile-android-pipeline.yaml
-    │   │   ├── mobile-ios-pipeline.yaml
-    │   │   └── mobile-pipeline.yaml
-    │   ├── .env.android.local    # Android Local config
-    │   ├── .env.android.sit      # Android SIT config (default)
-    │   ├── .env.android.uat      # Android UAT config
-    │   ├── .env.ios.local        # iOS Local config
-    │   ├── .env.ios.sit          # iOS SIT config (default)
-    │   ├── .env.ios.uat          # iOS UAT config
-    │   └── requirements.txt      # Python dependencies
+    │   ├── tests-mobile/         # Test files organized by features
+    │   │   ├── auth/
+    │   │   │   ├── auth.robot
+    │   │   │   └── login.robot
+    │   │   ├── books/
+    │   │   │   └── books.robot
+    │   │   ├── orders/
+    │   │   │   └── orders.robot
+    │   │   └── tagged_tests/
+    │   │       ├── smoke.robot
+    │   │       └── regression.robot
+    │   ├── pages/                # Page Object Model (Shared for Flutter)
+    │   │   ├── common/
+    │   │   │   └── BasePage.resource
+    │   │   ├── auth/
+    │   │   │   ├── AuthPage.resource
+    │   │   │   └── LoginPage.resource
+    │   │   ├── books/
+    │   │   │   └── BooksPage.resource
+    │   │   ├── dashboard/
+    │   │   │   └── DashboardPage.resource
+    │   │   └── orders/
+    │   │       └── OrdersPage.resource
+    │   ├── fixtures/             # Test data + Appium capabilities per env/platform
+    │   │   ├── testdata.local.android.yaml
+    │   │   ├── testdata.local.ios.yaml
+    │   │   ├── testdata.sit.android.yaml
+    │   │   └── testdata.sit.ios.yaml
+    │   ├── helpers/
+    │   │   ├── __init__.py
+    │   │   ├── env_loader.py
+    │   │   ├── app_manager.py
+    │   │   ├── testdata_loader.py
+    │   │   └── database_helper.py
+    │   ├── apps/
+    │   │   ├── .keep
+    │   │   └── app-release.apk
+    │   ├── db-scripts/
+    │   │   ├── setup.local.sql
+    │   │   ├── setup.sit.sql
+    │   │   └── cleanup.sql
+    │   ├── pipelines/
+    │   │   ├── mobile-pipeline.yaml
+    │   │   └── azure-pipelines-env-emulator-verification.yml
+    │   ├── package.json          # npm scripts: mobile:{os}:{env}:{mode}
+    │   ├── run.js                # Runner: translates args → robot command
+    │   └── requirements.txt
     │
     └── test-scenario/            # 📄 Test scenarios and documentation
         ├── PBI-7420-test-scenario.md   # Test scenario documentation
