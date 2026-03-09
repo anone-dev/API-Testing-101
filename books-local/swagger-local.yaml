@@ -6,6 +6,8 @@ info:
 servers:
   - url: http://localhost:5000
     description: Local Mock Server
+  - url: http://localhost:5001
+    description: Local Mock Server (macOS)
 
 security:
   - bearerAuth: []
