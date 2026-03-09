@@ -100,97 +100,71 @@ class _AuthScreenState extends State<AuthScreen> {
                         Text(_isLoginMode ? 'Login with Token' : 'Register to get started'),
                         const SizedBox(height: 24),
                         if (_isLoginMode)
-                          Semantics(
-                            label: 'token_input',
-                            container: true,
-                            child: TextFormField(
-                              key: const Key('token_input'),
-                              controller: _tokenController,
-                              decoration: InputDecoration(
-                                labelText: 'Access Token',
-                                border: const OutlineInputBorder(),
-                                prefixIcon: const Icon(Icons.key),
-                                suffixIcon: Semantics(
-                                  label: 'paste_token_button',
-                                  container: true,
-                                  child: IconButton(
-                                    key: const Key('paste_token_button'),
-                                    icon: const Icon(Icons.paste),
-                                    tooltip: 'Paste from clipboard',
-                                    onPressed: () async {
-                                      final data = await Clipboard.getData('text/plain');
-                                      if (data?.text != null) {
-                                        _tokenController.text = data!.text!;
-                                      }
-                                    },
-                                  ),
-                                ),
+                          TextFormField(
+                            key: const Key('token_input'),
+                            controller: _tokenController,
+                            decoration: InputDecoration(
+                              labelText: 'Access Token',
+                              border: const OutlineInputBorder(),
+                              prefixIcon: const Icon(Icons.key),
+                              suffixIcon: IconButton(
+                                key: const Key('paste_token_button'),
+                                icon: const Icon(Icons.paste),
+                                tooltip: 'Paste from clipboard',
+                                onPressed: () async {
+                                  final data = await Clipboard.getData('text/plain');
+                                  if (data?.text != null) {
+                                    _tokenController.text = data!.text!;
+                                  }
+                                },
                               ),
-                              validator: (v) => v?.isNotEmpty == true ? null : 'Required',
                             ),
+                            validator: (v) => v?.isNotEmpty == true ? null : 'Required',
                           ),
                         if (!_isLoginMode)
-                          Semantics(
-                            label: 'email_input',
-                            container: true,
-                            child: TextFormField(
-                              key: const Key('email_input'),
-                              controller: _emailController,
-                              decoration: const InputDecoration(
-                                labelText: 'Email',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.email),
-                              ),
-                              keyboardType: TextInputType.emailAddress,
-                              validator: (v) => v?.contains('@') == true ? null : 'Invalid email',
+                          TextFormField(
+                            key: const Key('email_input'),
+                            controller: _emailController,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.email),
                             ),
+                            keyboardType: TextInputType.emailAddress,
+                            validator: (v) => v?.contains('@') == true ? null : 'Invalid email',
                           ),
                         if (!_isLoginMode) const SizedBox(height: 16),
                         if (!_isLoginMode)
-                          Semantics(
-                            label: 'name_input',
-                            container: true,
-                            child: TextFormField(
-                              key: const Key('name_input'),
-                              controller: _nameController,
-                              decoration: const InputDecoration(
-                                labelText: 'Name',
-                                border: OutlineInputBorder(),
-                                prefixIcon: Icon(Icons.person),
-                              ),
-                              validator: (v) => v?.isNotEmpty == true ? null : 'Required',
+                          TextFormField(
+                            key: const Key('name_input'),
+                            controller: _nameController,
+                            decoration: const InputDecoration(
+                              labelText: 'Name',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.person),
                             ),
+                            validator: (v) => v?.isNotEmpty == true ? null : 'Required',
                           ),
                         const SizedBox(height: 24),
                         SizedBox(
                           width: double.infinity,
-                          child: Semantics(
-                            label: _isLoginMode ? 'login_button' : 'register_button',
-                            container: true,
-                            excludeSemantics: true,
-                            child: ElevatedButton(
-                              key: Key(_isLoginMode ? 'login_button' : 'register_button'),
-                              onPressed: _isLoading ? null : (_isLoginMode ? _loginWithToken : _register),
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.all(16),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                              child: _isLoading
-                                  ? const CircularProgressIndicator()
-                                  : Text(_isLoginMode ? 'Login' : 'Register', style: const TextStyle(fontSize: 16)),
+                          child: ElevatedButton(
+                            key: Key(_isLoginMode ? 'login_button' : 'register_button'),
+                            onPressed: _isLoading ? null : (_isLoginMode ? _loginWithToken : _register),
+                            style: ElevatedButton.styleFrom(
+                              padding: const EdgeInsets.all(16),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                             ),
+                            child: _isLoading
+                                ? const CircularProgressIndicator()
+                                : Text(_isLoginMode ? 'Login' : 'Register', style: const TextStyle(fontSize: 16)),
                           ),
                         ),
                         const SizedBox(height: 12),
-                        Semantics(
-                          label: 'toggle_mode_button',
-                          container: true,
-                          excludeSemantics: true,
-                          child: TextButton(
-                            key: const Key('toggle_mode_button'),
-                            onPressed: () => setState(() => _isLoginMode = !_isLoginMode),
-                            child: Text(_isLoginMode ? 'Need to register? Click here' : 'Have a token? Login here'),
-                          ),
+                        TextButton(
+                          key: const Key('toggle_mode_button'),
+                          onPressed: () => setState(() => _isLoginMode = !_isLoginMode),
+                          child: Text(_isLoginMode ? 'Need to register? Click here' : 'Have a token? Login here'),
                         ),
                         const SizedBox(height: 16),
                         const Text(

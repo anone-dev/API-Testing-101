@@ -44,22 +44,18 @@ class _BooksScreenState extends State<BooksScreen> {
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Semantics(
-            label: 'book_filter',
-            container: true,
-            child: SegmentedButton<String?>(
-              key: const Key('book_filter'),
-              segments: const [
-                ButtonSegment(value: null, label: Text('All')),
-                ButtonSegment(value: 'fiction', label: Text('Fiction')),
-                ButtonSegment(value: 'non-fiction', label: Text('Non-Fiction')),
-              ],
-              selected: {_filterType},
-              onSelectionChanged: (Set<String?> newSelection) {
-                setState(() => _filterType = newSelection.first);
-                _loadBooks();
-              },
-            ),
+          child: SegmentedButton<String?>(
+            key: const Key('book_filter'),
+            segments: const [
+              ButtonSegment(value: null, label: Text('All')),
+              ButtonSegment(value: 'fiction', label: Text('Fiction')),
+              ButtonSegment(value: 'non-fiction', label: Text('Non-Fiction')),
+            ],
+            selected: {_filterType},
+            onSelectionChanged: (Set<String?> newSelection) {
+              setState(() => _filterType = newSelection.first);
+              _loadBooks();
+            },
           ),
         ),
         Expanded(
@@ -72,35 +68,31 @@ class _BooksScreenState extends State<BooksScreen> {
                     itemCount: _books.length,
                     itemBuilder: (context, index) {
                       final book = _books[index];
-                      return Semantics(
-                        label: 'book_card_${book.id}',
-                        container: true,
-                        child: Card(
-                          key: Key('book_card_${book.id}'),
-                          margin: const EdgeInsets.only(bottom: 12),
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: book.type == 'fiction'
-                                  ? Colors.deepPurple
-                                  : Colors.orange,
-                              child: Text(book.emoji, style: const TextStyle(fontSize: 24)),
-                            ),
-                            title: Text(book.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text('ID: ${book.id} | ${book.type.toUpperCase()}'),
-                              ],
-                            ),
-                            trailing: Chip(
-                              label: Text(book.available ? 'Available' : 'Out of Stock'),
-                              backgroundColor: book.available ? Colors.green[100] : Colors.grey[300],
-                            ),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => BookDetailScreen(bookId: book.id),
-                              ),
+                      return Card(
+                        key: Key('book_card_${book.id}'),
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: book.type == 'fiction'
+                                ? Colors.deepPurple
+                                : Colors.orange,
+                            child: Text(book.emoji, style: const TextStyle(fontSize: 24)),
+                          ),
+                          title: Text(book.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('ID: ${book.id} | ${book.type.toUpperCase()}'),
+                            ],
+                          ),
+                          trailing: Chip(
+                            label: Text(book.available ? 'Available' : 'Out of Stock'),
+                            backgroundColor: book.available ? Colors.green[100] : Colors.grey[300],
+                          ),
+                          onTap: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => BookDetailScreen(bookId: book.id),
                             ),
                           ),
                         ),

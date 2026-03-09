@@ -3,17 +3,17 @@ Resource    ../common/BasePage.resource
 
 *** Variables ***
 # Auth Screen — Register mode
-${EMAIL_INPUT}              xpath=//android.widget.EditText[contains(@hint,'email_input')]
-${NAME_INPUT}               xpath=//android.widget.EditText[contains(@hint,'name_input')]
-${REGISTER_BUTTON}          xpath=//android.widget.Button[@content-desc='register_button']
+${EMAIL_INPUT}              accessibility_id=email_input
+${NAME_INPUT}               accessibility_id=name_input
+${REGISTER_BUTTON}          accessibility_id=register_button
 
 # Auth Screen — Login mode
-${TOKEN_INPUT}              xpath=//android.widget.EditText[contains(@hint,'token_input')]
-${LOGIN_BUTTON}             xpath=//android.widget.Button[@content-desc='login_button']
-${PASTE_TOKEN_BUTTON}       xpath=//android.widget.Button[@content-desc='paste_token_button']
+${TOKEN_INPUT}              accessibility_id=token_input
+${LOGIN_BUTTON}             accessibility_id=login_button
+${PASTE_TOKEN_BUTTON}       accessibility_id=paste_token_button
 
 # Toggle & shared
-${TOGGLE_MODE_BUTTON}       xpath=//android.widget.Button[@content-desc='toggle_mode_button']
+${TOGGLE_MODE_BUTTON}       accessibility_id=toggle_mode_button
 
 # Home Screen
 ${BOTTOM_NAV}               xpath=//android.widget.FrameLayout[@content-desc='bottom_nav']

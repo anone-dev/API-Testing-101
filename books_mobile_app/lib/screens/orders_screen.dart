@@ -65,39 +65,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
       builder: (context) => AlertDialog(
         key: const Key('update_order_dialog'),
         title: const Text('Update Customer Name'),
-        content: Semantics(
-          label: 'update_customer_name_input',
-          container: true,
-          child: TextField(
-            key: const Key('update_customer_name_input'),
-            controller: controller,
-            decoration: const InputDecoration(
-              labelText: 'Customer Name',
-              border: OutlineInputBorder(),
-            ),
-            autofocus: true,
+        content: TextField(
+          key: const Key('update_customer_name_input'),
+          controller: controller,
+          decoration: const InputDecoration(
+            labelText: 'Customer Name',
+            border: OutlineInputBorder(),
           ),
+          autofocus: true,
         ),
         actions: [
-          Semantics(
-            label: 'update_cancel_button',
-            container: true,
-            excludeSemantics: true,
-            child: TextButton(
-              key: const Key('update_cancel_button'),
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
-            ),
+          TextButton(
+            key: const Key('update_cancel_button'),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
           ),
-          Semantics(
-            label: 'update_confirm_button',
-            container: true,
-            excludeSemantics: true,
-            child: TextButton(
-              key: const Key('update_confirm_button'),
-              onPressed: () => Navigator.pop(context, controller.text),
-              child: const Text('Update'),
-            ),
+          TextButton(
+            key: const Key('update_confirm_button'),
+            onPressed: () => Navigator.pop(context, controller.text),
+            child: const Text('Update'),
           ),
         ],
       ),
@@ -136,79 +122,55 @@ class _OrdersScreenState extends State<OrdersScreen> {
                   itemCount: _orders.length,
                   itemBuilder: (context, index) {
                     final order = _orders[index];
-                    return Semantics(
-                      label: 'order_card_${order.id}',
-                      container: true,
-                      child: Card(
-                        key: Key('order_card_${order.id}'),
-                        margin: const EdgeInsets.only(bottom: 12),
-                        child: ListTile(
-                          leading: const CircleAvatar(child: Icon(Icons.shopping_bag)),
-                          title: Text('Order #${order.id}'),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Customer: ${order.customerName}'),
-                              Text('Book ID: ${order.bookId}'),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Semantics(
-                                label: 'edit_order_${order.id}',
-                                container: true,
-                                excludeSemantics: true,
-                                child: IconButton(
-                                  key: Key('edit_order_${order.id}'),
-                                  icon: const Icon(Icons.edit, color: Colors.blue),
-                                  onPressed: () => _updateOrder(order.id, order.customerName),
-                                ),
-                              ),
-                              Semantics(
-                                label: 'delete_order_${order.id}',
-                                container: true,
-                                excludeSemantics: true,
-                                child: IconButton(
-                                  key: Key('delete_order_${order.id}'),
-                                  icon: const Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () => showDialog(
-                                    context: context,
-                                    builder: (context) => AlertDialog(
-                                      key: const Key('delete_order_dialog'),
-                                      title: const Text('Delete Order'),
-                                      content: const Text('Are you sure?'),
-                                      actions: [
-                                        Semantics(
-                                          label: 'delete_cancel_button',
-                                          container: true,
-                                          excludeSemantics: true,
-                                          child: TextButton(
-                                            key: const Key('delete_cancel_button'),
-                                            onPressed: () => Navigator.pop(context),
-                                            child: const Text('Cancel'),
-                                          ),
-                                        ),
-                                        Semantics(
-                                          label: 'delete_confirm_button',
-                                          container: true,
-                                          excludeSemantics: true,
-                                          child: TextButton(
-                                            key: const Key('delete_confirm_button'),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                              _deleteOrder(order.id);
-                                            },
-                                            child: const Text('Delete', style: TextStyle(color: Colors.red)),
-                                          ),
-                                        ),
-                                      ],
+                    return Card(
+                      key: Key('order_card_${order.id}'),
+                      margin: const EdgeInsets.only(bottom: 12),
+                      child: ListTile(
+                        leading: const CircleAvatar(child: Icon(Icons.shopping_bag)),
+                        title: Text('Order #${order.id}'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Customer: ${order.customerName}'),
+                            Text('Book ID: ${order.bookId}'),
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              key: Key('edit_order_${order.id}'),
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () => _updateOrder(order.id, order.customerName),
+                            ),
+                            IconButton(
+                              key: Key('delete_order_${order.id}'),
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  key: const Key('delete_order_dialog'),
+                                  title: const Text('Delete Order'),
+                                  content: const Text('Are you sure?'),
+                                  actions: [
+                                    TextButton(
+                                      key: const Key('delete_cancel_button'),
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text('Cancel'),
                                     ),
-                                  ),
+                                    TextButton(
+                                      key: const Key('delete_confirm_button'),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        _deleteOrder(order.id);
+                                      },
+                                      child: const Text('Delete', style: TextStyle(color: Colors.red)),
+                                    ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ),
                     );
