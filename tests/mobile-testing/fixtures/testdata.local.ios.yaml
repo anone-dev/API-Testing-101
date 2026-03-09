@@ -23,6 +23,12 @@ USERS:
   empty_name:
     email: "emptyname@local.com"
     name: ""
+  logout_user:
+    email: "logout@local.com"
+    name: "Logout User"
+  login_user:
+    email: "loginuser@local.com"
+    name: "Login User"
 
 TOKEN:
   valid: ""

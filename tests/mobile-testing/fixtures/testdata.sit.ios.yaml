@@ -23,6 +23,12 @@ USERS:
   empty_name:
     email: "emptyname@sit.com"
     name: ""
+  logout_user:
+    email: "logout@sit.com"
+    name: "Logout User"
+  login_user:
+    email: "loginuser@sit.com"
+    name: "Login User"
 
 TOKEN:
   valid: ""

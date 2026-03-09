@@ -3,8 +3,8 @@ APPIUM_URL: http://localhost:4723
 PLATFORM_NAME: Android
 PLATFORM_VERSION: "16"
 DEVICE_NAME: emulator-5554
-# APP_PATH: d:\myPOC\API-Testing-101\tests\mobile-testing\apps\app-release.apk
-APP_PATH: /Users/anoneph/git/API-Testing-101-1/tests/mobile-testing/apps/app-release.apk
+APP_PATH: d:\myPOC\API-Testing-101\tests\mobile-testing\apps\app-release.apk
+# APP_PATH: /Users/anoneph/git/API-Testing-101-1/tests/mobile-testing/apps/app-release.apk
 AUTOMATION_NAME: UiAutomator2
 AUTO_GRANT_PERMISSIONS: true
 
@@ -25,6 +25,12 @@ USERS:
   empty_name:
     email: "emptyname@local.com"
     name: ""
+  logout_user:
+    email: "logout@local.com"
+    name: "Logout User"
+  login_user:
+    email: "loginuser@local.com"
+    name: "Login User"
 
 TOKEN:
   valid: ""

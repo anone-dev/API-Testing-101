@@ -14,11 +14,14 @@ Test Teardown    Run Keyword If Test Failed    Capture Page Screenshot
 ${PLATFORM}    android
 ${ENV}         local
 ${HEADLESS}    false
+${REGISTER_ERROR_MSG}    xpath=//*[contains(@content-desc, 'register_error_message')]
+${LOGIN_ERROR_MSG}       xpath=//*[contains(@content-desc, 'login_error_message')]
 
 *** Test Cases ***
 [TC-0001] User Should Register Successfully With Valid Email And Name
     [Documentation]    Register with valid email and name → navigate to HomeScreen
     [Tags]    Feature:Auth    Important:Critical    Scenario:Success
+    [Teardown]    Logout
     # 📝 Arrange
     ${email}=    Set Variable    ${USERS.valid.email}
     ${name}=     Set Variable    ${USERS.valid.name}
@@ -31,15 +34,11 @@ ${HEADLESS}    false
 [TC-0002] User Should See Error When Register With Duplicate Email
     [Documentation]    Register with already-used email → error snackbar displayed
     [Tags]    Feature:Auth    Important:High    Scenario:Alternative
-    # 📝 Arrange — register first time
-    Register With Credentials    ${USERS.valid.email}    ${USERS.valid.name}
-    Verify Home Screen Displayed
-    Logout
     # 🎬 Act — register again with same email
     Verify Register Page Displayed
     Register With Credentials    ${USERS.duplicate.email}    ${USERS.duplicate.name}
     # ✅ Assert
-    Wait For Element    xpath=//android.widget.TextView[contains(@text,'already')]
+    Wait For Element    ${REGISTER_ERROR_MSG}
 
 [TC-0003] User Should See Validation Error With Invalid Email Format
     [Documentation]    Register with non-email string → form validation error
@@ -62,14 +61,15 @@ ${HEADLESS}    false
 [TC-0005] User Should Login Successfully With Valid Token
     [Documentation]    Register → copy token from Info dialog → logout → login with token → HomeScreen
     [Tags]    Feature:Auth    Important:Critical    Scenario:Success
+    [Teardown]    Logout
     # 📝 Arrange — register and get token from Info dialog
-    Register With Credentials    ${USERS.valid.email}    ${USERS.valid.name}
+    Register With Credentials    ${USERS.login_user.email}    ${USERS.login_user.name}
     Verify Home Screen Displayed
     ${token}=    Get Token From Info Dialog
     Logout
     # 🎬 Act
     Switch To Login Mode
-    Login With Token    ${token}
+    Login With Token    ${token}    use_paste=True
     # ✅ Assert
     Verify Home Screen Displayed
 
@@ -80,13 +80,13 @@ ${HEADLESS}    false
     Switch To Login Mode
     Login With Token    ${TOKEN.invalid}
     # ✅ Assert
-    Wait For Element    xpath=//android.widget.TextView[contains(@text,'Invalid token')]
+    Wait For Element    ${LOGIN_ERROR_MSG}
 
 [TC-0007] User Should See Error When Login With Empty Token
     [Documentation]    Login with empty token → validation error
     [Tags]    Feature:Auth    Important:High    Scenario:Alternative
     # 🎬 Act
-    Switch To Login Mode
+    Verify Login Page Displayed
     Login With Token    ${TOKEN.empty}
     # ✅ Assert — stays on login page
     Verify Login Page Displayed
@@ -95,7 +95,7 @@ ${HEADLESS}    false
     [Documentation]    Tap toggle button → Login mode displayed
     [Tags]    Feature:Auth    Important:Medium    Scenario:Success
     # 🎬 Act
-    Verify Register Page Displayed
+    Switch To Register Mode
     Switch To Login Mode
     # ✅ Assert
     Verify Login Page Displayed
@@ -104,7 +104,7 @@ ${HEADLESS}    false
     [Documentation]    Tap toggle button again → Register mode displayed
     [Tags]    Feature:Auth    Important:Medium    Scenario:Success
     # 🎬 Act
-    Switch To Login Mode
+    Verify Login Page Displayed
     Switch To Register Mode
     # ✅ Assert
     Verify Register Page Displayed
@@ -113,7 +113,7 @@ ${HEADLESS}    false
     [Documentation]    Logout from HomeScreen → AuthScreen displayed
     [Tags]    Feature:Auth    Important:Critical    Scenario:Success
     # 📝 Arrange
-    Register With Credentials    ${USERS.valid.email}    ${USERS.valid.name}
+    Register With Credentials    ${USERS.logout_user.email}    ${USERS.logout_user.name}
     Verify Home Screen Displayed
     # 🎬 Act
     Logout

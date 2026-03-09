@@ -3,7 +3,7 @@ Resource    ../common/BasePage.resource
 
 *** Variables ***
 # Bottom nav — Orders tab
-${ORDERS_TAB}                   xpath=//android.widget.TextView[@text='Orders']
+${ORDERS_TAB}                   android=new UiSelector().description("Orders Tab 2 of 2")
 
 # Orders Screen
 ${EMPTY_ORDERS_TEXT}            xpath=//android.widget.TextView[@text='No orders yet']
@@ -13,11 +13,11 @@ ${CUSTOMER_NAME_INPUT}          accessibility_id=customer_name_input
 ${CREATE_ORDER_BUTTON}          accessibility_id=create_order_button
 
 # Order Card (dynamic)
-# Use: accessibility_id=order_card_${order_id}
+# Use: accessibility id=order_card_${order_id}
 
 # Edit / Delete icons (dynamic)
-# Use: accessibility_id=edit_order_${order_id}
-# Use: accessibility_id=delete_order_${order_id}
+# Use: accessibility id=edit_order_${order_id}
+# Use: accessibility id=delete_order_${order_id}
 
 # Update Order Dialog
 ${UPDATE_ORDER_DIALOG}          accessibility_id=update_order_dialog

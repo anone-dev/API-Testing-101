@@ -3,12 +3,12 @@ Resource    ../common/BasePage.resource
 
 *** Variables ***
 # Auth Screen — Register mode
-${EMAIL_INPUT}              accessibility_id=email_input
-${NAME_INPUT}               accessibility_id=name_input
+${EMAIL_INPUT}              android=new UiSelector().className("android.widget.EditText").instance(1)
+${NAME_INPUT}               android=new UiSelector().className("android.widget.EditText").instance(3)
 ${REGISTER_BUTTON}          accessibility_id=register_button
 
 # Auth Screen — Login mode
-${TOKEN_INPUT}              accessibility_id=token_input
+${TOKEN_INPUT}              android=new UiSelector().className("android.widget.EditText").instance(1)
 ${LOGIN_BUTTON}             accessibility_id=login_button
 ${PASTE_TOKEN_BUTTON}       accessibility_id=paste_token_button
 
@@ -16,11 +16,11 @@ ${PASTE_TOKEN_BUTTON}       accessibility_id=paste_token_button
 ${TOGGLE_MODE_BUTTON}       accessibility_id=toggle_mode_button
 
 # Home Screen
-${BOTTOM_NAV}               xpath=//android.widget.FrameLayout[@content-desc='bottom_nav']
-${LOGOUT_BUTTON}            xpath=//android.widget.Button[@content-desc='logout_button']
-${INFO_BUTTON}              xpath=//android.widget.Button[@content-desc='info_button']
-${TOKEN_TEXT}               xpath=//android.widget.TextView[@text and string-length(@text)>20 and contains(@text,'-')]
-${COPY_TOKEN_BUTTON}        xpath=//android.widget.Button[@text='Copy Token']
+${BOTTOM_NAV}               accessibility_id=bottom_nav
+${LOGOUT_BUTTON}            accessibility_id=logout_button
+${INFO_BUTTON}              accessibility_id=info_button
+${COPY_TOKEN_BUTTON}        accessibility_id=Copy Token
+${CLOSE_DIALOG_BUTTON}      accessibility_id=Close
 
 *** Keywords ***
 Verify Register Page Displayed
@@ -43,14 +43,17 @@ Switch To Register Mode
 Register With Credentials
     [Arguments]    ${email}    ${name}
     Verify Register Page Displayed
-    Input Text Safe    ${EMAIL_INPUT}    ${email}
+    Click Element Safe  ${EMAIL_INPUT}
+    Input Text Safe   ${EMAIL_INPUT}    ${email}
+    Click Element Safe       ${NAME_INPUT}
     Input Text Safe    ${NAME_INPUT}    ${name}
     Click Element Safe    ${REGISTER_BUTTON}
 
 Login With Token
-    [Arguments]    ${token}
+    [Arguments]    ${token}    ${use_paste}=False
     Verify Login Page Displayed
-    Input Text Safe    ${TOKEN_INPUT}    ${token}
+    Run Keyword If    '${use_paste}' == 'True'    Click Element Safe    ${PASTE_TOKEN_BUTTON}
+    ...    ELSE    Input Text Safe    ${TOKEN_INPUT}    ${token}
     Click Element Safe    ${LOGIN_BUTTON}
 
 Verify Home Screen Displayed
@@ -65,9 +68,7 @@ Logout
 
 Get Token From Info Dialog
     Click Element Safe    ${INFO_BUTTON}
-    Wait For Element    ${TOKEN_TEXT}
-    ${token}=    Get Text    ${TOKEN_TEXT}
-    Click Element    ${COPY_TOKEN_BUTTON}
-    Wait For Element    xpath=//android.widget.TextView[@text='Token copied to clipboard']
-    Click Element    xpath=//android.widget.Button[@text='Close']
+    Click Element Safe    ${COPY_TOKEN_BUTTON}
+    ${token}=    Execute Script    mobile: getClipboard    
+    Click Element Safe    ${CLOSE_DIALOG_BUTTON}
     RETURN    ${token}

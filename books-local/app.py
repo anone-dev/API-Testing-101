@@ -159,6 +159,13 @@ def reset_stock():
     books = copy.deepcopy(initial_books)
     return jsonify({"message": "Stock reset successfully"}), 200
 
+@app.route('/reset-clients', methods=['POST'])
+def reset_clients():
+    global clients, orders
+    clients.clear()
+    orders.clear()
+    return jsonify({"message": "Clients and orders reset successfully"}), 200
+
 if __name__ == '__main__':
     import os
     port = int(os.environ.get('API_PORT', 5000))

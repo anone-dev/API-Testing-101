@@ -344,6 +344,7 @@
                 <input type="text" id="clientName" data-testid="name-input" placeholder="Your Name">
             </div>
             <button onclick="registerClient()" data-testid="register-button">Register & Get Token</button>
+            <button onclick="resetRegister()" data-testid="reset-register-button" class="danger" style="margin-left: 10px;">🗑️ Reset Register</button>
             <div id="tokenDisplay" class="token-display hidden" data-testid="token-display" style="margin-top: 10px;"></div>
         </div>
 
@@ -648,6 +649,18 @@
             
             if (tab === 'books') loadBooks();
             if (tab === 'orders') loadOrders();
+        }
+
+        function resetRegister() {
+            fetch(`${API_URL}/reset-clients`, { method: 'POST' })
+                .then(() => showAlert('✅ Registration data cleared!'))
+                .catch(() => showAlert('✅ Registration data cleared (offline)!'));
+            token = '';
+            localStorage.removeItem('apiToken');
+            document.getElementById('clientEmail').value = '';
+            document.getElementById('clientName').value = '';
+            document.getElementById('tokenDisplay').innerHTML = '';
+            document.getElementById('tokenDisplay').classList.add('hidden');
         }
 
         async function registerClient() {

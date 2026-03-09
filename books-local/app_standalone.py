@@ -178,9 +178,12 @@ def reset_stock():
     books = copy.deepcopy(initial_books)
     return jsonify({"message": "Stock reset successfully"}), 200
 
-@app.route('/clear-auth', methods=['POST'])
-def clear_auth():
-    return jsonify({"message": "Auth cleared"}), 200
+@app.route('/reset-clients', methods=['POST'])
+def reset_clients():
+    global clients, orders
+    clients.clear()
+    orders.clear()
+    return jsonify({"message": "Clients and orders reset successfully"}), 200
 
 
 
