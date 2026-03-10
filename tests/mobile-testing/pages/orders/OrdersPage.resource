@@ -1,34 +1,6 @@
 *** Settings ***
-Resource    ../common/BasePage.resource
-
-*** Variables ***
-# Bottom nav — Orders tab
-${ORDERS_TAB}                   android=new UiSelector().description("Orders Tab 2 of 2")
-
-# Orders Screen
-${EMPTY_ORDERS_TEXT}            xpath=//android.widget.TextView[@text='No orders yet']
-
-# Book Detail — Create Order
-${CUSTOMER_NAME_INPUT}          accessibility_id=customer_name_input
-${CREATE_ORDER_BUTTON}          accessibility_id=create_order_button
-
-# Order Card (dynamic)
-# Use: accessibility id=order_card_${order_id}
-
-# Edit / Delete icons (dynamic)
-# Use: accessibility id=edit_order_${order_id}
-# Use: accessibility id=delete_order_${order_id}
-
-# Update Order Dialog
-${UPDATE_ORDER_DIALOG}          accessibility_id=update_order_dialog
-${UPDATE_NAME_INPUT}            accessibility_id=update_customer_name_input
-${UPDATE_CONFIRM_BUTTON}        accessibility_id=update_confirm_button
-${UPDATE_CANCEL_BUTTON}         accessibility_id=update_cancel_button
-
-# Delete Order Dialog
-${DELETE_ORDER_DIALOG}          accessibility_id=delete_order_dialog
-${DELETE_CONFIRM_BUTTON}        accessibility_id=delete_confirm_button
-${DELETE_CANCEL_BUTTON}         accessibility_id=delete_cancel_button
+Resource      ../common/BasePage.resource
+Variables     locators.${PLATFORM}.yaml
 
 *** Keywords ***
 Navigate To Orders Tab

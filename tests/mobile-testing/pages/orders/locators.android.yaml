@@ -1,0 +1,20 @@
+# Bottom nav — Orders tab
+ORDERS_TAB: "android=new UiSelector().description(\"Orders Tab 2 of 2\")"
+
+# Orders Screen
+EMPTY_ORDERS_TEXT: "xpath=//android.widget.TextView[@text='No orders yet']"
+
+# Book Detail — Create Order
+CUSTOMER_NAME_INPUT: "accessibility_id=customer_name_input"
+CREATE_ORDER_BUTTON: "accessibility_id=create_order_button"
+
+# Update Order Dialog
+UPDATE_ORDER_DIALOG: "accessibility_id=update_order_dialog"
+UPDATE_NAME_INPUT: "accessibility_id=update_customer_name_input"
+UPDATE_CONFIRM_BUTTON: "accessibility_id=update_confirm_button"
+UPDATE_CANCEL_BUTTON: "accessibility_id=update_cancel_button"
+
+# Delete Order Dialog
+DELETE_ORDER_DIALOG: "accessibility_id=delete_order_dialog"
+DELETE_CONFIRM_BUTTON: "accessibility_id=delete_confirm_button"
+DELETE_CANCEL_BUTTON: "accessibility_id=delete_cancel_button"

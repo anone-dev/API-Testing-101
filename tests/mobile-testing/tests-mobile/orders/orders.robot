@@ -6,6 +6,9 @@ Resource         ../../pages/books/BooksPage.resource
 Resource         ../../pages/orders/OrdersPage.resource
 Resource         ../../pages/common/BasePage.resource
 Variables        ../../fixtures/testdata.${ENV}.${PLATFORM}.yaml
+Variables        ../../pages/auth/locators.${PLATFORM}.yaml
+Variables        ../../pages/books/locators.${PLATFORM}.yaml
+Variables        ../../pages/orders/locators.${PLATFORM}.yaml
 
 Suite Setup      Setup Mobile Test
 Suite Teardown   Teardown Mobile Test

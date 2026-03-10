@@ -26,14 +26,17 @@ tests/mobile-testing/
 │   ├── common/
 │   │   └── BasePage.resource
 │   ├── auth/
-│   │   ├── AuthPage.resource
-│   │   └── LoginPage.resource
+│   │   ├── locators.android.yaml     # Auth locators — Android
+│   │   ├── locators.ios.yaml         # Auth locators — iOS
+│   │   └── AuthPage.resource         # Keywords only
 │   ├── books/
-│   │   └── BooksPage.resource
-│   ├── dashboard/
-│   │   └── DashboardPage.resource
+│   │   ├── locators.android.yaml     # Books locators — Android
+│   │   ├── locators.ios.yaml         # Books locators — iOS
+│   │   └── BooksPage.resource        # Keywords only
 │   └── orders/
-│       └── OrdersPage.resource
+│       ├── locators.android.yaml     # Orders locators — Android
+│       ├── locators.ios.yaml         # Orders locators — iOS
+│       └── OrdersPage.resource       # Keywords only
 │
 ├── fixtures/                     # Test data + Appium capabilities per env/platform
 │   ├── testdata.local.android.yaml
@@ -58,8 +61,7 @@ tests/mobile-testing/
 │
 └── tests-mobile/
     ├── auth/
-    │   ├── auth.robot
-    │   └── login.robot
+    │   └── auth.robot
     ├── books/
     │   └── books.robot
     ├── orders/
@@ -166,8 +168,17 @@ robot --variable ENV:sit   --variable PLATFORM:android --include Important:Criti
 ```
 
 ### Run with Output Directory
+
+> ⚠️ ถ้าไม่กำหนด `--outputdir` ไฟล์ `output.xml`, `log.html`, `report.html` จะถูกสร้างใน current directory และ**ทับกันทุกครั้ง**ที่รัน แนะนำให้กำหนดเสมอ
+
 ```bash
+# Android Local - auth suite only
+robot --variable ENV:local --variable PLATFORM:android --outputdir results/android-local tests-mobile/auth/auth.robot
+
+# Android Local - all suites
 robot --variable ENV:local --variable PLATFORM:android --outputdir results/android-local tests-mobile/
+
+# iOS SIT - all suites
 robot --variable ENV:sit   --variable PLATFORM:ios     --outputdir results/ios-sit       tests-mobile/
 ```
 

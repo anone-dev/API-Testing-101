@@ -4,6 +4,7 @@ Documentation    [PBI-0001] User Authentication Feature
 Resource         ../../pages/auth/AuthPage.resource
 Resource         ../../pages/common/BasePage.resource
 Variables        ../../fixtures/testdata.${ENV}.${PLATFORM}.yaml
+Variables        ../../pages/auth/locators.${PLATFORM}.yaml
 
 Suite Setup      Setup Mobile Test
 Suite Teardown   Teardown Mobile Test

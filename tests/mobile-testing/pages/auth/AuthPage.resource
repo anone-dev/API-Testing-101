@@ -1,26 +1,6 @@
 *** Settings ***
-Resource    ../common/BasePage.resource
-
-*** Variables ***
-# Auth Screen — Register mode
-${EMAIL_INPUT}              android=new UiSelector().className("android.widget.EditText").instance(1)
-${NAME_INPUT}               android=new UiSelector().className("android.widget.EditText").instance(3)
-${REGISTER_BUTTON}          accessibility_id=register_button
-
-# Auth Screen — Login mode
-${TOKEN_INPUT}              android=new UiSelector().className("android.widget.EditText").instance(1)
-${LOGIN_BUTTON}             accessibility_id=login_button
-${PASTE_TOKEN_BUTTON}       accessibility_id=paste_token_button
-
-# Toggle & shared
-${TOGGLE_MODE_BUTTON}       accessibility_id=toggle_mode_button
-
-# Home Screen
-${BOTTOM_NAV}               accessibility_id=bottom_nav
-${LOGOUT_BUTTON}            accessibility_id=logout_button
-${INFO_BUTTON}              accessibility_id=info_button
-${COPY_TOKEN_BUTTON}        accessibility_id=Copy Token
-${CLOSE_DIALOG_BUTTON}      accessibility_id=Close
+Resource      ../common/BasePage.resource
+Variables     locators.${PLATFORM}.yaml
 
 *** Keywords ***
 Verify Register Page Displayed
