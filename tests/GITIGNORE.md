@@ -10,12 +10,151 @@
 - `.env.local` - Local development environment
 
 ### 📝 Tracked Files (ถูก track และ commit ได้)
-- `.env` - SIT environment (default)
+- `.env.sit` - SIT environment (default)
 - `.env.uat` - UAT environment
-- `fixtures/test-data.ts` - SIT test data
-- `fixtures/test-data.uat.ts` - UAT test data
+- `fixtures/testdata.sit.ts` - SIT test data
+- `fixtures/testdata.uat.ts` - UAT test data
 - `db-scripts/setup.sit.sql` - SIT database setup
 - `db-scripts/setup.uat.sql` - UAT database setup
+
+### ❌ Also Ignored
+- `node_modules/`
+- `/test-results/`
+- `/playwright-report/`
+- `/blob-report/`
+- `/playwright/.cache/`
+- `/playwright/.auth/`
+- `/trace/`
+- `*.js.map`, `*.d.ts`, `dist/`, `build/`
+- `package-lock.json`
+
+---
+
+## 🌐 Web Testing (.gitignore)
+
+### ✅ Ignored Files (ไม่ถูก track)
+- `.env.local` - Local development environment
+
+### 📝 Tracked Files (ถูก track และ commit ได้)
+- `.env.sit` - SIT environment (default)
+- `.env.uat` - UAT environment
+- `fixtures/testdata.sit.json` - SIT test data
+- `fixtures/testdata.uat.json` - UAT test data
+- `db-scripts/setup.sit.sql` - SIT database setup
+- `db-scripts/setup.uat.sql` - UAT database setup
+
+### ❌ Also Ignored
+- `node_modules/`
+- `/test-results/`
+- `/playwright-report/`
+- `/blob-report/`
+- `/playwright/.cache/`
+- `/playwright/.auth/`
+- `/trace/`, `/videos/`, `/screenshots/`
+- `*.js.map`, `*.d.ts`, `dist/`, `build/`
+- `package-lock.json`
+
+---
+
+## 📱 Mobile Testing (.gitignore)
+
+### ✅ Ignored Files (ไม่ถูก track)
+- `.env.local` - Local environment
+- `apps/*.apk` - Android app binaries
+- `apps/*.ipa` - iOS IPA files
+- `apps/*.app` - iOS app bundles
+- `apps/*.aab` - Android App Bundles
+
+### 📝 Tracked Files (ถูก track และ commit ได้)
+- `apps/.keep` - Placeholder (force track empty folder)
+- `fixtures/testdata.sit.android.yaml` - Android SIT test data
+- `fixtures/testdata.sit.ios.yaml` - iOS SIT test data
+- `fixtures/testdata.local.android.yaml` - Android local test data
+- `fixtures/testdata.local.ios.yaml` - iOS local test data
+- `db-scripts/setup.sit.sql` - SIT database setup
+- `db-scripts/setup.local.sql` - Local database setup
+- `db-scripts/cleanup.sql` - Cleanup script
+- `helpers/database_helper.py` - Database helper
+
+### ❌ Also Ignored
+- `log.html`, `report.html`, `output.xml`
+- `results/`, `screenshots/`, `pabot_results/`
+- `*.pyc`, `__pycache__/`, `venv/`, `env/`
+- `node_modules/`, `package-lock.json`
+- `.vscode/`, `.idea/`
+- `.DS_Store`, `Thumbs.db`
+
+---
+
+## 🎯 Why This Configuration?
+
+### ✅ **Ignore Local Files**
+- **เหตุผล**: ไฟล์ local มักมีข้อมูลส่วนตัว เช่น localhost URLs, local database credentials
+- **ประโยชน์**: แต่ละ developer สามารถมี local config ของตัวเองโดยไม่กระทบคนอื่น
+
+### 📝 **Track SIT & UAT Files**
+- **เหตุผล**: SIT และ UAT เป็น shared environments ที่ทีมใช้ร่วมกัน
+- **ประโยชน์**: 
+  - ทุกคนใช้ config เดียวกันสำหรับ SIT/UAT
+  - ง่ายต่อการ sync และ maintain
+  - CI/CD pipeline สามารถใช้ไฟล์เหล่านี้ได้ทันที
+
+### 🚫 **Ignore App Binaries (Mobile)**
+- **เหตุผล**: ไฟล์ .apk/.ipa/.app มีขนาดใหญ่ ไม่ควรอยู่ใน git
+- **ประโยชน์**: ลด repository size, ดาวน์โหลด binary จาก artifact storage แทน
+
+---
+
+## 🔒 Security Best Practices
+
+### ⚠️ **สิ่งที่ควรระวัง:**
+
+1. **ไม่ควรใส่ sensitive data ใน .env files ที่ถูก track**
+   - ❌ ห้าม: Real passwords, API keys, tokens
+   - ✅ ควรใช้: Placeholder values, dummy credentials
+
+2. **ใช้ Secret Management สำหรับ production**
+   - Azure Key Vault
+   - AWS Secrets Manager
+   - HashiCorp Vault
+
+3. **ตัวอย่าง .env ที่ปลอดภัย:**
+   ```bash
+   # ✅ Good - Placeholder values
+   API_BASE_URL=https://sit-api.example.com
+   USERNAME=sit_user
+   PASSWORD=<use-secret-manager>
+   
+   # ❌ Bad - Real credentials
+   API_BASE_URL=https://sit-api.example.com
+   USERNAME=admin@company.com
+   PASSWORD=MyRealPassword123!
+   ```
+
+---
+
+## 📋 Quick Reference
+
+### Check Ignored Files
+```bash
+# ดูว่าไฟล์ไหนถูก ignore
+git status --ignored
+
+# ตรวจสอบว่าไฟล์ถูก ignore หรือไม่
+git check-ignore -v .env.local
+```
+
+### Force Add Ignored File (ถ้าจำเป็น)
+```bash
+# บังคับ add ไฟล์ที่ถูก ignore
+git add -f .env.local
+```
+
+### Update .gitignore
+```bash
+# หลังจากแก้ไข .gitignore ให้ clear cache
+git rm -r --cached .
+git add .
 
 ### ❌ Also Ignored
 - `node_modules/`

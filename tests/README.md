@@ -53,7 +53,7 @@ tests/
 │
 ├── web-testing/              # 🌐 Web UI Testing with Playwright + TypeScript
 │   ├── tests-web/            # Web test files by features
-│   │   └── feature-1/        # Feature 1 test cases
+│   │   └── FR06-webUI/       # FR06 Web UI tests
 │   ├── pages/                # Page Object Model
 │   │   ├── BasePage.ts       # Base page with common methods
 │   │   └── BooksAppPage.ts   # Books app page object
@@ -151,29 +151,29 @@ tests/
 ```bash
 cd tests/api-testing
 npm install
-npm test                    # รันเทสทั้งหมด (SIT)
-npm run test:local         # รันเทสบน Local
-npm run test:uat           # รันเทสบน UAT
-npm run test:smoke         # รัน Smoke tests
-npm run test:regression    # รัน Regression tests
+npm run api:sit:all:cliMode          # รันเทสทั้งหมด (SIT)
+npm run api:local:all:cliMode        # รันเทสบน Local
+npm run api:uat:all:cliMode          # รันเทสบน UAT
+npm run api:sit:all:guiMode          # รันแบบ interactive (SIT)
+npm run report                        # ดู HTML report
 ```
 📦 **Features**: Schema validation, Postman integration, Multi-environment support
 
-📈 [API Testing Documentation](tests/api-testing/README.md)
+📈 [API Testing Documentation](api-testing/README.md)
 
 ### 2. 🌐 Web UI Testing
 ```bash
 cd tests/web-testing
 npm install
-npm test                    # รันเทสทั้งหมด (SIT)
-npm run test:local         # รันเทสบน Local
-npm run test:uat           # รันเทสบน UAT
-npm run test:ui            # รันแบบ interactive
-npm run test:headed        # รันแบบเห็นบราวเซอร์
+npm run ui:sit:all:cliMode           # รันเทสทั้งหมด (SIT)
+npm run ui:local:all:cliMode         # รันเทสบน Local
+npm run ui:sit:FR06:cliMode          # รัน FR06 Web UI suite (SIT)
+npm run ui:local:FR06:guiMode        # รันแบบ interactive (Local)
+npm run report                        # ดู HTML report
 ```
-📦 **Features**: Page Object Model, Accessibility testing, Performance monitoring
+📦 **Features**: Page Object Model, Global auth setup, Multi-environment support
 
-📈 [Web UI Testing Documentation](tests/web-testing/README.md)
+📈 [Web UI Testing Documentation](web-testing/README.md)
 
 ### 3. 📱 Mobile Testing
 ```bash
@@ -181,14 +181,17 @@ cd tests/mobile-testing
 pip install -r requirements.txt
 appium                      # เริ่ม Appium server
 # ใน terminal ใหม่:
-robot tests-mobile/                                              # รันทั้งหมด (android/local)
-robot --variable ENV:sit --variable PLATFORM:android tests-mobile/   # Android SIT
-robot --variable ENV:local --variable PLATFORM:ios tests-mobile/     # iOS Local
-robot --include smoke tests-mobile/                              # รัน Smoke tests
+robot --variable ENV:sit --variable PLATFORM:android --outputdir results/android-sit tests-mobile/
+robot --variable ENV:local --variable PLATFORM:android --outputdir results/android-local tests-mobile/
+robot --variable ENV:sit --variable PLATFORM:ios --outputdir results/ios-sit tests-mobile/
+# รัน feature เดียว
+robot --variable ENV:sit --variable PLATFORM:android tests-mobile/auth/
+# รัน tagged tests
+robot --variable ENV:sit --variable PLATFORM:android tests-mobile/tagged_tests/smoke.robot
 ```
-📦 **Features**: Android/iOS support, Parallel execution, Cloud platform integration
+📦 **Features**: Android/iOS shared tests, Page Object Model with YAML locators, Multi-environment support
 
-📈 [Mobile Testing Documentation](tests/mobile-testing/README.md)
+📈 [Mobile Testing Documentation](mobile-testing/README.md)
 
 ### 4. 📄 Test Scenarios
 เก็บเอกสาร test scenarios และ documentation ในโฟลเดอร์ `tests/test-scenario/`
@@ -205,19 +208,19 @@ robot --include smoke tests-mobile/                              # รัน Smo
 ### Quick Commands
 ```bash
 # API Testing
-npm test              # SIT (default)
-npm run test:local    # Local
-npm run test:uat      # UAT
+npm run api:sit:all:cliMode     # SIT (default)
+npm run api:local:all:cliMode   # Local
+npm run api:uat:all:cliMode     # UAT
 
 # Web Testing
-npm test              # SIT (default)
-npm run test:local    # Local
-npm run test:uat      # UAT
+npm run ui:sit:all:cliMode      # SIT (default)
+npm run ui:local:all:cliMode    # Local
+npm run ui:sit:FR06:cliMode     # FR06 suite (SIT)
 
 # Mobile Testing
-robot tests-mobile/                                                  # android/local (default)
-robot --variable ENV:sit --variable PLATFORM:android tests-mobile/   # Android SIT
-robot --variable ENV:local --variable PLATFORM:ios tests-mobile/     # iOS Local
+robot --variable ENV:sit --variable PLATFORM:android tests-mobile/    # Android SIT
+robot --variable ENV:local --variable PLATFORM:android tests-mobile/  # Android Local
+robot --variable ENV:sit --variable PLATFORM:ios tests-mobile/        # iOS SIT
 ```
 
 ## 🛠️ เทคโนโลยีที่ใช้
@@ -254,40 +257,27 @@ appium driver install xcuitest      # iOS (macOS only)
 ### 🔥 รันเทสแบบ Smoke Test (ทดสอบรวดเร็ว)
 
 ```bash
-# API Testing
-cd tests/api-testing && npm run test:smoke
-
-# Web UI Testing  
-cd tests/web-testing && npm run test:smoke
-
 # Mobile Testing
-cd tests/mobile-testing && robot --include smoke tests-mobile/
+cd tests/mobile-testing && robot --variable ENV:sit --variable PLATFORM:android tests-mobile/tagged_tests/smoke.robot
 ```
 
 ### 🔄 รันเทสแบบ Regression (ทดสอบครบวงจร)
 
 ```bash
-# API Testing
-cd tests/api-testing && npm run test:regression
-
-# Web UI Testing
-cd tests/web-testing && npm run test:regression
-
 # Mobile Testing
-cd tests/mobile-testing && robot --include regression tests-mobile/
+cd tests/mobile-testing && robot --variable ENV:sit --variable PLATFORM:android tests-mobile/tagged_tests/regression.robot
 ```
 
-### 🔀 รันเทสแบบ Parallel (รันพร้อมกัน)
+### 🎯 รัน API Testing แบบแยก Feature
 
 ```bash
-# API Testing
-cd tests/api-testing && npm run test:parallel
-
-# Web UI Testing
-cd tests/web-testing && npm run test:parallel
-
-# Mobile Testing
-cd tests/mobile-testing && pabot --processes 2 tests-mobile/
+cd tests/api-testing
+npm run api:sit:SRS01-healthCheck:cliMode
+npm run api:sit:SRS01-authentication:cliMode
+npm run api:sit:SRS01-books:cliMode
+npm run api:sit:SRS01-orders:cliMode
+npm run api:sit:SRS04-successFlows:cliMode
+npm run api:sit:SRS04-failureFlows:cliMode
 ```
 
 ## 📈 รายงานผลการทดสอบ
