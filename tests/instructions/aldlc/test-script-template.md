@@ -6,10 +6,9 @@ project-root/
 └── tests/
     ├── api-testing/              # 🔌 API Testing with Playwright + TypeScript
     │   ├── tests-api/            # Test files organized by features
-    │   │   ├── feature-1/        # Feature 1: User & Post APIs
-    │   │   ├── feature-2/        # Feature 2: Schema validation
-    │   │   ├── feature-3/        # Feature 3: Comments & Env-specific
-    │   │   └── tagged-tests.spec.ts  # Smoke & Regression tests
+    │   │   ├── feature-1/        # Feature 1 tests
+    │   │   ├── feature-2/        # Feature 2 tests
+    │   │   └── feature-3/        # Feature 3 tests
     │   ├── helpers/              # API helpers and utilities
     │   │   ├── api.helper.ts     # API request wrapper
     │   │   ├── schema.validator.ts  # JSON schema validator
@@ -18,9 +17,9 @@ project-root/
     │   ├── schemas/              # JSON schema definitions
     │   │   └── api.schema.ts     # API response schemas
     │   ├── fixtures/             # Test data per environment
-    │   │   ├── test-data.ts      # SIT test data (default)
-    │   │   ├── test-data.local.ts # Local test data
-    │   │   └── test-data.uat.ts  # UAT test data
+    │   │   ├── testdata.sit.ts   # SIT test data (default)
+    │   │   ├── testdata.local.ts # Local test data
+    │   │   └── testdata.uat.ts   # UAT test data
     │   ├── postman/              # Postman collection integration
     │   │   ├── collection.json   # Postman collection
     │   │   ├── environment.sit.json  # SIT environment
@@ -32,7 +31,7 @@ project-root/
     │   │   └── cleanup.sql       # Cleanup script
     │   ├── pipelines/            # CI/CD pipeline configs
     │   │   └── api-pipeline.yaml # Azure DevOps pipeline
-    │   ├── .env                  # SIT environment (default)
+    │   ├── .env.sit              # SIT environment (default)
     │   ├── .env.local            # Local environment
     │   ├── .env.uat              # UAT environment
     │   ├── playwright.config.ts  # Playwright configuration
@@ -46,8 +45,7 @@ project-root/
     │   │   └── tagged-tests.spec.ts  # Smoke & Regression tests
     │   ├── pages/                # Page Object Model
     │   │   ├── BasePage.ts       # Base page with common methods
-    │   │   ├── LoginPage.ts      # Login page object
-    │   │   └── DashboardPage.ts  # Dashboard page object
+    │   │   └── BooksAppPage.ts   # Books app page object
     │   ├── fixtures/             # Test data per environment
     │   │   ├── testdata.sit.json # SIT test data (default)
     │   │   ├── testdata.local.json # Local test data
@@ -62,7 +60,7 @@ project-root/
     │   │   └── cleanup.sql       # Cleanup script
     │   ├── pipelines/            # CI/CD pipeline configs
     │   │   └── web-pipeline.yaml # Azure DevOps pipeline
-    │   ├── .env                  # SIT environment (default)
+    │   ├── .env.sit              # SIT environment (default)
     │   ├── .env.local            # Local environment
     │   ├── .env.uat              # UAT environment
     │   ├── playwright.config.ts  # Playwright configuration
@@ -71,8 +69,7 @@ project-root/
     ├── mobile-testing/           # 📱 Mobile Testing with Robot Framework + Appium
     │   ├── tests-mobile/         # Test files organized by features
     │   │   ├── auth/
-    │   │   │   ├── auth.robot
-    │   │   │   └── login.robot
+    │   │   │   └── auth.robot
     │   │   ├── books/
     │   │   │   └── books.robot
     │   │   ├── orders/
@@ -85,27 +82,27 @@ project-root/
     │   │   │   └── BasePage.resource
     │   │   ├── auth/
     │   │   │   ├── AuthPage.resource
-    │   │   │   └── LoginPage.resource
+    │   │   │   ├── locators.android.yaml
+    │   │   │   └── locators.ios.yaml
     │   │   ├── books/
-    │   │   │   └── BooksPage.resource
-    │   │   ├── dashboard/
-    │   │   │   └── DashboardPage.resource
+    │   │   │   ├── BooksPage.resource
+    │   │   │   ├── locators.android.yaml
+    │   │   │   └── locators.ios.yaml
     │   │   └── orders/
-    │   │       └── OrdersPage.resource
+    │   │       ├── OrdersPage.resource
+    │   │       ├── locators.android.yaml
+    │   │       └── locators.ios.yaml
     │   ├── fixtures/             # Test data + Appium capabilities per env/platform
     │   │   ├── testdata.local.android.yaml
     │   │   ├── testdata.local.ios.yaml
     │   │   ├── testdata.sit.android.yaml
     │   │   └── testdata.sit.ios.yaml
     │   ├── helpers/
-    │   │   ├── __init__.py
-    │   │   ├── env_loader.py
-    │   │   ├── app_manager.py
-    │   │   ├── testdata_loader.py
     │   │   └── database_helper.py
     │   ├── apps/
     │   │   ├── .keep
-    │   │   └── app-release.apk
+    │   │   ├── app-release.apk
+    │   │   └── ios-debug.app/
     │   ├── db-scripts/
     │   │   ├── setup.local.sql
     │   │   ├── setup.sit.sql
