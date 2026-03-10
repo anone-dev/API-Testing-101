@@ -34,10 +34,9 @@
 ```
 api-testing/
 ├── 📂 tests-api/                   # Test files organized by features
-│   ├── feature-1/                  # Feature 1: User & Post APIs
-│   ├── feature-2/                  # Feature 2: Schema validation
-│   ├── feature-3/                  # Feature 3: Comments & Env-specific
-│   └── tagged-tests.spec.ts        # Smoke & Regression tests
+│   ├── feature-1/                  # Feature 1 tests
+│   ├── feature-2/                  # Feature 2 tests
+│   └── feature-3/                  # Feature 3 tests
 ├── 📂 helpers/                     # API helpers and utilities
 │   ├── api.helper.ts               # API request wrapper
 │   ├── schema.validator.ts         # JSON schema validator
@@ -46,9 +45,9 @@ api-testing/
 ├── 📂 schemas/                     # JSON schema definitions
 │   └── api.schema.ts               # API response schemas
 ├── 📂 fixtures/                    # Test data per environment
-│   ├── test-data.sit.ts            # SIT test data
-│   ├── test-data.local.ts          # Local test data
-│   └── test-data.uat.ts            # UAT test data
+│   ├── testdata.sit.ts             # SIT test data
+│   ├── testdata.local.ts           # Local test data
+│   └── testdata.uat.ts             # UAT test data
 ├── 📂 postman/                     # Postman collection integration
 │   ├── collection.json             # Postman collection
 │   ├── environment.sit.json        # SIT environment
@@ -164,7 +163,7 @@ expect(responseBody).toBeDefined();
 import { test, expect } from '@playwright/test';
 import { apiHelper } from '../helpers/api.helper';
 import { validateSchema } from '../helpers/schema.validator';
-import userData from '../fixtures/test-data.sit';
+import userData from '../fixtures/testdata.sit';
 ```
 
 ---

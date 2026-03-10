@@ -35,8 +35,7 @@
 mobile-testing/
 ├── 📂 tests-mobile/                # Test files organized by features
 │   ├── auth/
-│   │   ├── auth.robot
-│   │   └── login.robot
+│   │   └── auth.robot
 │   ├── books/
 │   │   └── books.robot
 │   ├── orders/
@@ -48,28 +47,28 @@ mobile-testing/
 │   ├── common/
 │   │   └── BasePage.resource
 │   ├── auth/
-│   │   ├── AuthPage.resource
-│   │   └── LoginPage.resource
+│   │   ├── locators.android.yaml   # Auth locators — Android
+│   │   ├── locators.ios.yaml       # Auth locators — iOS
+│   │   └── AuthPage.resource       # Keywords only
 │   ├── books/
-│   │   └── BooksPage.resource
-│   ├── dashboard/
-│   │   └── DashboardPage.resource
+│   │   ├── locators.android.yaml   # Books locators — Android
+│   │   ├── locators.ios.yaml       # Books locators — iOS
+│   │   └── BooksPage.resource      # Keywords only
 │   └── orders/
-│       └── OrdersPage.resource
+│       ├── locators.android.yaml   # Orders locators — Android
+│       ├── locators.ios.yaml       # Orders locators — iOS
+│       └── OrdersPage.resource     # Keywords only
 ├── 📂 fixtures/                    # Test data + Appium capabilities per env/platform
 │   ├── testdata.local.android.yaml
 │   ├── testdata.local.ios.yaml
 │   ├── testdata.sit.android.yaml
 │   └── testdata.sit.ios.yaml
 ├── 📂 helpers/
-│   ├── __init__.py
-│   ├── env_loader.py
-│   ├── testdata_loader.py
-│   ├── database_helper.py
-│   └── app_manager.py
+│   └── database_helper.py
 ├── 📂 apps/
 │   ├── .keep
-│   └── app-release.apk
+│   ├── app-release.apk             # Android build
+│   └── ios-debug.app/              # iOS debug build
 ├── 📂 db-scripts/
 │   ├── setup.local.sql
 │   ├── setup.sit.sql
@@ -299,7 +298,8 @@ ${DEVICE_NAME}          emulator-5554
 Documentation    [PBI-1234] User Authentication Feature
 ...              Test suite for user login and authentication
 Library          AppiumLibrary
-Resource         ../pages/android/auth/LoginPage.robot
+Resource         ../../pages/auth/AuthPage.resource
+Resource         ../../pages/common/BasePage.resource
 ```
 
 ---
@@ -391,7 +391,7 @@ tests-mobile/
 *** Settings ***
 Documentation    [PBI-1234] User Login Feature
 Library          AppiumLibrary
-Resource         ../../pages/auth/LoginPage.resource
+Resource         ../../pages/auth/AuthPage.resource
 Resource         ../../pages/common/BasePage.resource
 Variables        ../../fixtures/testdata.${ENV}.${PLATFORM}.yaml
 

@@ -67,7 +67,8 @@ tests/api-testing/
 ├── helpers/
 │   ├── api.helper.ts         # API request wrapper
 │   ├── env.helper.ts         # Environment loader
-│   └── schema.validator.ts   # AJV JSON schema validator
+│   ├── schema.validator.ts   # AJV JSON schema validator
+│   └── databaseHelper.ts     # Database operations
 │
 ├── fixtures/
 │   ├── testdata.sit.ts       # SIT test data
@@ -79,8 +80,19 @@ tests/api-testing/
 │
 ├── postman/                  # Postman collection & environments
 │
+├── db-scripts/
+│   ├── setup.local.sql       # Local data setup
+│   ├── setup.sit.sql         # SIT data setup
+│   ├── setup.uat.sql         # UAT data setup
+│   └── cleanup.sql           # Cleanup script
+│
 ├── pipelines/
-│   └── api-pipeline.yaml     # Azure DevOps pipeline
+│   ├── api-pipeline.yaml          # Azure DevOps pipeline
+│   └── api-pipeline-with-mock.yaml # Pipeline with mock server
+│
+├── playwright-report/        # Test execution reports
+│
+├── test-results/             # Test artifacts & logs
 │
 └── tests-api/
     ├── SRS01-healthCheck/         # TC-12569–12570

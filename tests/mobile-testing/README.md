@@ -51,13 +51,11 @@ tests/mobile-testing/
 │   └── README.md
 │
 ├── helpers/
-│   ├── env_loader.py
-│   ├── database_helper.py
-│   ├── testdata_loader.py
-│   └── app_manager.py
+│   └── database_helper.py
 │
 ├── apps/
-│   └── app-release.apk
+│   ├── app-release.apk             # Android build
+│   └── ios-debug.app/              # iOS debug build
 │
 └── tests-mobile/
     ├── auth/
@@ -138,16 +136,16 @@ appium
 
 ```bash
 # Android Local (default - no variables needed)
-robot tests-mobile/
+robot --outputdir results/android-local tests-mobile/
 
 # Android SIT
-robot --variable ENV:sit tests-mobile/
+robot --variable ENV:sit --outputdir results/android-sit tests-mobile/
 
 # iOS Local
-robot --variable PLATFORM:ios tests-mobile/
+robot --variable PLATFORM:ios --outputdir results/ios-local tests-mobile/
 
 # iOS SIT
-robot --variable ENV:sit --variable PLATFORM:ios tests-mobile/
+robot --variable ENV:sit --variable PLATFORM:ios --outputdir results/ios-sit tests-mobile/
 ```
 
 ### Run Specific Suite

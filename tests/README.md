@@ -16,145 +16,133 @@
 ## 📁 โครงสร้างโปรเจคต์
 
 ```
-coe-standard-qa-automation/
-└── tests/
-    ├── api-testing/              # 🔌 API Testing with Playwright + TypeScript
-    │   ├── tests-api/            # Test files organized by features
-    │   │   ├── feature-1/        # Feature 1: User & Post APIs
-    │   │   ├── feature-2/        # Feature 2: Schema validation
-    │   │   ├── feature-3/        # Feature 3: Comments & Env-specific
-    │   │   └── tagged-tests.spec.ts  # Smoke & Regression tests
-    │   ├── helpers/              # API helpers and utilities
-    │   │   ├── api.helper.ts     # API request wrapper
-    │   │   ├── schema.validator.ts  # JSON schema validator
-    │   │   ├── env.helper.ts     # Environment config loader
-    │   │   └── databaseHelper.ts # Database operations
-    │   ├── schemas/              # JSON schema definitions
-    │   │   └── api.schema.ts     # API response schemas
-    │   ├── fixtures/             # Test data per environment
-    │   │   ├── test-data.ts      # SIT test data (default)
-    │   │   ├── test-data.local.ts # Local test data
-    │   │   └── test-data.uat.ts  # UAT test data
-    │   ├── postman/              # Postman collection integration
-    │   │   ├── collection.json   # Postman collection
-    │   │   ├── environment.sit.json  # SIT environment
-    │   │   └── environment.uat.json  # UAT environment
-    │   ├── db-scripts/           # Database setup scripts
-    │   │   ├── setup.local.sql   # Local data setup
-    │   │   ├── setup.sit.sql     # SIT data setup
-    │   │   ├── setup.uat.sql     # UAT data setup
-    │   │   └── cleanup.sql       # Cleanup script
-    │   ├── pipelines/            # CI/CD pipeline configs
-    │   │   └── api-pipeline.yaml # Azure DevOps pipeline
-    │   ├── .env                  # SIT environment (default)
-    │   ├── .env.local            # Local environment
-    │   ├── .env.uat              # UAT environment
-    │   ├── playwright.config.ts  # Playwright configuration
-    │   └── package.json          # Dependencies & scripts
-    │
-    ├── web-testing/              # 🌐 Web UI Testing with Playwright + TypeScript
-    │   ├── tests-web/             # Web test files by features
-    │   │   ├── feature-1/        # Feature 1: Login tests
-    │   │   ├── feature-2/        # Feature 2: User management
-    │   │   ├── feature-3/        # Feature 3: Dashboard
-    │   │   └── tagged-tests.spec.ts  # Smoke & Regression tests
-    │   ├── pages/                # Page Object Model
-    │   │   ├── BasePage.ts       # Base page with common methods
-    │   │   ├── LoginPage.ts      # Login page object
-    │   │   └── DashboardPage.ts  # Dashboard page object
-    │   ├── fixtures/             # Test data per environment
-    │   │   ├── testdata.sit.json # SIT test data (default)
-    │   │   ├── testdata.local.json # Local test data
-    │   │   └── testdata.uat.json # UAT test data
-    │   ├── helpers/              # Test utilities
-    │   │   ├── testDataLoader.ts # Load test data
-    │   │   └── databaseHelper.ts # Database operations
-    │   ├── db-scripts/           # Database setup scripts
-    │   │   ├── setup.local.sql   # Local data setup
-    │   │   ├── setup.sit.sql     # SIT data setup
-    │   │   ├── setup.uat.sql     # UAT data setup
-    │   │   └── cleanup.sql       # Cleanup script
-    │   ├── pipelines/            # CI/CD pipeline configs
-    │   │   └── web-pipeline.yaml # Azure DevOps pipeline
-    │   ├── .env                  # SIT environment (default)
-    │   ├── .env.local            # Local environment
-    │   ├── .env.uat              # UAT environment
-    │   ├── playwright.config.ts  # Playwright configuration
-    │   └── package.json          # Dependencies & scripts
-    │
-    ├── mobile-testing/           # 📱 Mobile Testing with Robot Framework + Appium
-    │   ├── tests-mobile/         # Test cases by platform
-    │   │   ├── android/          # Android test cases
-    │   │   │   ├── auth/         # Authentication tests
-    │   │   │   ├── payment/      # Payment tests
-    │   │   │   └── profile/      # Profile tests
-    │   │   ├── ios/              # iOS test cases
-    │   │   │   ├── auth/         # Authentication tests
-    │   │   │   ├── payment/      # Payment tests
-    │   │   │   └── profile/      # Profile tests
-    │   │   └── tagged-tests/     # Smoke & Regression tests
-    │   │       ├── smoke.android.robot
-    │   │       ├── smoke.ios.robot
-    │   │       ├── regression.android.robot
-    │   │       └── regression.ios.robot
-    │   ├── pages/                # Page Object Model
-    │   │   ├── android/          # Android page objects
-    │   │   │   ├── common/       # Common keywords
-    │   │   │   ├── auth/         # LoginPage, RegisterPage
-    │   │   │   ├── payment/      # Payment page objects
-    │   │   │   └── profile/      # Profile page objects
-    │   │   └── ios/              # iOS page objects (same structure)
-    │   ├── fixtures/             # Test data per environment
-    │   │   ├── android/          # Android test data
-    │   │   │   ├── local.yaml    # Local test data
-    │   │   │   ├── sit.yaml      # SIT test data
-    │   │   │   └── uat.yaml      # UAT test data
-    │   │   └── ios/              # iOS test data (same structure)
-    │   ├── helpers/              # Python utility functions
-    │   │   ├── app_manager.py    # App version management
-    │   │   ├── testdata_loader.py  # Load YAML test data
-    │   │   └── database_helper.py  # Database operations
-    │   ├── apps/                 # App binaries (.apk, .app, .ipa)
-    │   │   ├── android/          # Android apps
-    │   │   │   ├── local/        # Local environment apps
-    │   │   │   ├── sit/          # SIT environment apps
-    │   │   │   └── uat/          # UAT environment apps
-    │   │   ├── ios/              # iOS apps
-    │   │   │   ├── local/        # Local environment apps
-    │   │   │   ├── sit/          # SIT environment apps
-    │   │   │   └── uat/          # UAT environment apps
-    │   │   └── versions.json     # App version tracking
-    │   ├── db-scripts/           # Database setup scripts
-    │   │   ├── setup.local.sql   # Local data setup
-    │   │   ├── setup.sit.sql     # SIT data setup
-    │   │   ├── setup.uat.sql     # UAT data setup
-    │   │   └── cleanup.sql       # Cleanup script
-    │   ├── pipelines/            # CI/CD pipeline configs
-    │   │   ├── mobile-android-pipeline.yaml
-    │   │   ├── mobile-ios-pipeline.yaml
-    │   │   └── mobile-pipeline.yaml
-    │   ├── .env.android.local    # Android Local config
-    │   ├── .env.android.sit      # Android SIT config (default)
-    │   ├── .env.android.uat      # Android UAT config
-    │   ├── .env.ios.local        # iOS Local config
-    │   ├── .env.ios.sit          # iOS SIT config (default)
-    │   ├── .env.ios.uat          # iOS UAT config
-    │   └── requirements.txt      # Python dependencies
-    │
-    ├── instructions/             # 📚 Guidelines and Templates
-    │   ├── aldlc/                # ALDLC-specific templates
-    │   │   ├── test-cases-template.md    # Test case template
-    │   │   └── test-script-template.md   # Test script template
-    │   ├── api-testing-playwright-guideline.md  # API testing with Playwright
-    │   ├── api-testing-postman-guideline.md     # API testing with Postman
-    │   ├── web-testing-playwright-guideline.md  # Web testing with Playwright
-    │   ├── mobile-testing-robot-guideline.md    # Mobile testing with Robot Framework
-    │   ├── test-scenario-guildeline.md          # Test scenario guide
-    │   └── versioncontrol-guideline.md          # Git workflow guide
-    │
-    └── test-scenario/            # 📄 Test scenarios and documentation
-        ├── PBI-7420-test-scenario.md   # Test scenario documentation
-        └── PBI-7420-test-scenario.csv  # Test scenario in CSV format
+tests/
+├── api-testing/              # 🔌 API Testing with Playwright + TypeScript
+│   ├── tests-api/            # Test files organized by features
+│   │   ├── feature-1/        # Feature 1 test cases
+│   │   ├── feature-2/        # Feature 2 test cases
+│   │   └── feature-3/        # Feature 3 test cases
+│   ├── helpers/              # API helpers and utilities
+│   │   ├── api.helper.ts     # API request wrapper
+│   │   ├── schema.validator.ts  # JSON schema validator
+│   │   ├── env.helper.ts     # Environment config loader
+│   │   └── databaseHelper.ts # Database operations
+│   ├── schemas/              # JSON schema definitions
+│   │   └── api.schema.ts     # API response schemas
+│   ├── fixtures/             # Test data per environment
+│   │   ├── testdata.sit.ts   # SIT test data (default)
+│   │   ├── testdata.local.ts # Local test data
+│   │   └── testdata.uat.ts   # UAT test data
+│   ├── postman/              # Postman collection integration
+│   │   ├── collection.json          # Postman collection
+│   │   ├── environment.sit.json     # SIT environment
+│   │   └── environment.uat.json     # UAT environment
+│   ├── db-scripts/           # Database setup scripts
+│   │   ├── setup.local.sql   # Local data setup
+│   │   ├── setup.sit.sql     # SIT data setup
+│   │   ├── setup.uat.sql     # UAT data setup
+│   │   └── cleanup.sql       # Cleanup script
+│   ├── pipelines/            # CI/CD pipeline configs
+│   │   ├── api-pipeline.yaml          # Azure DevOps pipeline
+│   │   └── api-pipeline-with-mock.yaml # Pipeline with mock server
+│   ├── .env.local            # Local environment
+│   ├── .env.sit              # SIT environment (default)
+│   ├── .env.uat              # UAT environment
+│   ├── playwright.config.ts  # Playwright configuration
+│   └── package.json          # Dependencies & scripts
+│
+├── web-testing/              # 🌐 Web UI Testing with Playwright + TypeScript
+│   ├── tests-web/            # Web test files by features
+│   │   └── feature-1/        # Feature 1 test cases
+│   ├── pages/                # Page Object Model
+│   │   ├── BasePage.ts       # Base page with common methods
+│   │   └── BooksAppPage.ts   # Books app page object
+│   ├── fixtures/             # Test data per environment
+│   │   ├── testdata.sit.json  # SIT test data (default)
+│   │   ├── testdata.local.json # Local test data
+│   │   └── testdata.uat.json  # UAT test data
+│   ├── helpers/              # Test utilities
+│   │   ├── testDataLoader.ts  # Load test data
+│   │   └── databaseHelper.ts  # Database operations
+│   ├── db-scripts/           # Database setup scripts
+│   │   ├── setup.local.sql   # Local data setup
+│   │   ├── setup.sit.sql     # SIT data setup
+│   │   ├── setup.uat.sql     # UAT data setup
+│   │   └── cleanup.sql       # Cleanup script
+│   ├── pipelines/            # CI/CD pipeline configs
+│   │   └── web-pipeline.yaml # Azure DevOps pipeline
+│   ├── .env.local            # Local environment
+│   ├── .env.sit              # SIT environment (default)
+│   ├── .env.uat              # UAT environment
+│   ├── globalSetup.ts        # Global test setup
+│   ├── playwright.config.ts  # Playwright configuration
+│   └── package.json          # Dependencies & scripts
+│
+├── mobile-testing/           # 📱 Mobile Testing with Robot Framework + Appium
+│   ├── tests-mobile/         # Test cases organized by feature
+│   │   ├── auth/             # Authentication tests
+│   │   │   └── auth.robot
+│   │   ├── books/            # Books feature tests
+│   │   │   └── books.robot
+│   │   ├── orders/           # Orders feature tests
+│   │   │   └── orders.robot
+│   │   └── tagged_tests/     # Smoke & Regression suites
+│   │       ├── smoke.robot
+│   │       └── regression.robot
+│   ├── pages/                # Page Object Model (shared Android & iOS)
+│   │   ├── common/
+│   │   │   └── BasePage.resource
+│   │   ├── auth/
+│   │   │   ├── locators.android.yaml  # Auth locators — Android
+│   │   │   ├── locators.ios.yaml      # Auth locators — iOS
+│   │   │   └── AuthPage.resource      # Keywords only
+│   │   ├── books/
+│   │   │   ├── locators.android.yaml  # Books locators — Android
+│   │   │   ├── locators.ios.yaml      # Books locators — iOS
+│   │   │   └── BooksPage.resource     # Keywords only
+│   │   └── orders/
+│   │       ├── locators.android.yaml  # Orders locators — Android
+│   │       ├── locators.ios.yaml      # Orders locators — iOS
+│   │       └── OrdersPage.resource    # Keywords only
+│   ├── fixtures/             # Test data + Appium capabilities per env/platform
+│   │   ├── testdata.local.android.yaml
+│   │   ├── testdata.local.ios.yaml
+│   │   ├── testdata.sit.android.yaml
+│   │   └── testdata.sit.ios.yaml
+│   ├── helpers/              # Python utility functions
+│   │   └── database_helper.py  # Database operations
+│   ├── apps/                 # App binaries
+│   │   ├── app-release.apk   # Android build
+│   │   └── ios-debug.app/    # iOS debug build
+│   ├── db-scripts/           # Database setup scripts
+│   │   ├── setup.local.sql   # Local data setup
+│   │   ├── setup.sit.sql     # SIT data setup
+│   │   └── cleanup.sql       # Cleanup script
+│   ├── pipelines/            # CI/CD pipeline configs
+│   │   ├── mobile-pipeline.yaml
+│   │   └── azure-pipelines-env-emulator-verification.yml
+│   └── requirements.txt      # Python dependencies
+│
+├── instructions/             # 📚 Guidelines and Templates
+│   ├── aldlc/                # ALDLC-specific templates
+│   │   ├── test-cases-template.md    # Test case template
+│   │   └── test-script-template.md   # Test script template
+│   ├── api-testing-playwright-guideline.md  # API testing with Playwright
+│   ├── api-testing-postman-guideline.md     # API testing with Postman
+│   ├── web-testing-playwright-guideline.md  # Web testing with Playwright
+│   ├── mobile-testing-robot-guideline.md    # Mobile testing with Robot Framework
+│   ├── test-scenario-guildeline.md          # Test scenario guide
+│   └── versioncontrol-guideline.md          # Git workflow guide
+│
+└── test-scenario/            # 📄 Test scenarios and documentation
+    ├── SRS-01-api-server-test-scenario.csv
+    ├── SRS-01-workitem-ids.md
+    ├── SRS-02-mobile-app-test-scenario.csv
+    ├── SRS-02-workitem-ids.md
+    ├── SRS-03-api-specification-test-scenario.csv
+    ├── SRS-03-workitem-ids.md
+    ├── SRS-04-business-flow-test-scenario.csv
+    └── SRS-04-workitem-ids.md
 ```
 
 ## 🚀 การเริ่มต้นใช้งาน
@@ -193,11 +181,10 @@ cd tests/mobile-testing
 pip install -r requirements.txt
 appium                      # เริ่ม Appium server
 # ใน terminal ใหม่:
-robot tests-mobile/android/        # รัน Android tests (SIT)
-robot tests-mobile/ios/            # รัน iOS tests (SIT)
-robot --variable ENV:local tests-mobile/android/   # รันบน Local
-robot --variable ENV:uat tests-mobile/android/     # รันบน UAT
-robot --include smoke tests-mobile/ # รัน Smoke tests
+robot tests-mobile/                                              # รันทั้งหมด (android/local)
+robot --variable ENV:sit --variable PLATFORM:android tests-mobile/   # Android SIT
+robot --variable ENV:local --variable PLATFORM:ios tests-mobile/     # iOS Local
+robot --include smoke tests-mobile/                              # รัน Smoke tests
 ```
 📦 **Features**: Android/iOS support, Parallel execution, Cloud platform integration
 
@@ -228,9 +215,9 @@ npm run test:local    # Local
 npm run test:uat      # UAT
 
 # Mobile Testing
-robot tests-mobile/android/                        # SIT (default)
-robot --variable ENV:local tests-mobile/android/   # Local
-robot --variable ENV:uat tests-mobile/android/     # UAT
+robot tests-mobile/                                                  # android/local (default)
+robot --variable ENV:sit --variable PLATFORM:android tests-mobile/   # Android SIT
+robot --variable ENV:local --variable PLATFORM:ios tests-mobile/     # iOS Local
 ```
 
 ## 🛠️ เทคโนโลยีที่ใช้
