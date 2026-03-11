@@ -37,6 +37,28 @@ stages:
         steps:
 
           - script: |
+              echo "=== Disk usage before cleanup ==="
+              df -h /
+
+              echo "=== Cleaning Docker images & containers ==="
+              docker system prune -af --volumes 2>/dev/null || true
+
+              echo "=== Cleaning npm cache ==="
+              npm cache clean --force 2>/dev/null || true
+
+              echo "=== Cleaning apt cache ==="
+              sudo apt-get clean 2>/dev/null || true
+              sudo rm -rf /var/lib/apt/lists/* 2>/dev/null || true
+
+              echo "=== Cleaning tmp files ==="
+              sudo rm -rf /tmp/* 2>/dev/null || true
+
+              echo "=== Disk usage after cleanup ==="
+              df -h /
+            displayName: 'Clean Up Disk Space'
+            continueOnError: true
+
+          - script: |
               chmod +x $(mockServerDir)/BooksAPI-Linux
               $(mockServerDir)/BooksAPI-Linux &
               echo $! > /tmp/mock_server.pid
